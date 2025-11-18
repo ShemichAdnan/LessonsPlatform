@@ -64,7 +64,7 @@ export function CreateAd({ user }: CreateAdProps) {
   };
 
   return (
-    <div className="h-full overflow-auto bg-gray-900">
+    <div className="h-full overflow-auto bg-gray-900 overflow-scroll no-scrollbar">
       <div className="max-w-3xl mx-auto p-6">
         <div className="mb-6">
           <h1 className="text-3xl mb-2">Create an Ad</h1>
@@ -75,7 +75,7 @@ export function CreateAd({ user }: CreateAdProps) {
           </p>
         </div>
 
-        <Card >
+        <Card className='bg-gradient-to-br from-gray-800  to-gray-900 border-gray-700'>
           <CardHeader>
             <CardTitle >Ad Details</CardTitle>
             <CardDescription >Fill in the information about your {adType === 'tutor' ? 'offering' : 'request'}</CardDescription>
@@ -260,7 +260,7 @@ export function CreateAd({ user }: CreateAdProps) {
                 />
               </div>
 
-              <Button type="submit" className="w-full" size="lg">
+              <Button type="submit" className="w-full bg-gradient-to-br from-blue-600 to-purple-600 cursor-pointer" size="lg">
                 Create Ad
               </Button>
             </form>

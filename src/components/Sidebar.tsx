@@ -93,7 +93,7 @@ export function Sidebar({
         <Button
           variant="outline"
           size="sm"
-          className="w-full border-gray-700 text-gray-300"
+          className="w-full border-gray-700 text-gray-300 cursor-pointer hover:bg-gray-700"
           onClick={onLogout}
         >
           <LogOut className="w-4 h-4 mr-2" />

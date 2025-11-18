@@ -154,8 +154,10 @@ export function Messages({ user }: MessagesProps) {
             <button
               key={conversation.id}
               onClick={() => setSelectedConversation(conversation)}
-              className={`w-full p-4 flex items-start gap-3 hover:bg-blue-950  border-b border-gray-100 ${
-                selectedConversation?.id === conversation.id ? 'bg-blue-600' : ''
+              className={`w-full p-4 flex items-start gap-3 border-b border-gray-100 ${
+                selectedConversation?.id === conversation.id 
+                  ? 'bg-blue-600' 
+                  : 'hover:bg-blue-950'
               }`}
             >
               <div className="relative">

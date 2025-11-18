@@ -243,7 +243,7 @@ export function BrowseAds({ user }: BrowseAdsProps) {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-gray-800 border-b border-gray-700 p-6 space-y-4">
+      <div className="bg-gray-800 border-b border-gray-700 p-3 space-y-4">
         <div className="flex gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -269,7 +269,7 @@ export function BrowseAds({ user }: BrowseAdsProps) {
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-6">
-                <div className="space-y-2">
+                <div className="space-y-2 ">
                   <Label>Location</Label>
                   <Select
                     value={filterLocation}
@@ -318,16 +318,31 @@ export function BrowseAds({ user }: BrowseAdsProps) {
         </div>
 
         <Tabs value={filterType} onValueChange={(v: any) => setFilterType(v)}>
-          <TabsList>
-            <TabsTrigger value="all">All Ads</TabsTrigger>
-            <TabsTrigger value="tutor">Tutors</TabsTrigger>
-            <TabsTrigger value="student">Students</TabsTrigger>
+          <TabsList className="gap-3">
+            <TabsTrigger
+              value="all"
+              className="hover:bg-gray-700  data-[state=active]:bg-gray-700 text-gray-100 cursor-pointer"
+            >
+              All Ads
+            </TabsTrigger>
+            <TabsTrigger
+              value="tutor"
+              className="hover:bg-gray-700  data-[state=active]:bg-gray-700 text-gray-100 cursor-pointer"
+            >
+              Tutors
+            </TabsTrigger>
+            <TabsTrigger
+              value="student"
+              className="hover:bg-gray-700  data-[state=active]:bg-gray-700 text-gray-100 cursor-pointer"
+            >
+              Students
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       {/* Results */}
-      <div className="flex-1 overflow-auto p-6 bg-gray-900">
+      <div className="flex-1 overflow-auto p-6 bg-gray-900 overflow-scroll no-scrollbar">
         <div className="mb-4 text-gray-400">
           {filteredAds.length} {filteredAds.length === 1 ? "result" : "results"}{" "}
           found
@@ -336,7 +351,7 @@ export function BrowseAds({ user }: BrowseAdsProps) {
           {filteredAds.map((ad) => (
             <Card
               key={ad.id}
-              className="bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
+              className="bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 border-gray-700 hover:shadow-lg hover:border-blue-500 hover:from-gray-750 hover:via-gray-750 hover:to-gray-850 transition-all cursor-pointer flex flex-col"
               onClick={() => setSelectedAd(ad)}
             >
               <CardHeader>
@@ -363,44 +378,51 @@ export function BrowseAds({ user }: BrowseAdsProps) {
                     </CardDescription>
                   </div>
                 </div>
-                {ad.rating && (
-                  <div className="flex items-center gap-1 text-sm">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span>{ad.rating}</span>
-                    <span className="text-gray-400">
-                      ({ad.reviews} reviews)
-                    </span>
-                  </div>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  {ad.areas.slice(0, 3).map((area) => (
-                    <Badge key={area} variant="outline">
-                      {area}
-                    </Badge>
-                  ))}
-                </div>
-                <p className="text-sm text-gray-400 line-clamp-2">
-                  {ad.description}
-                </p>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
-                  {ad.pricePerHour && (
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />
-                      <span>${ad.pricePerHour}/hr</span>
+                <div className="h-6">
+                  {ad.rating && (
+                    <div className="flex items-center gap-1 text-sm">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span>{ad.rating}</span>
+                      <span className="text-gray-400">
+                        ({ad.reviews} reviews)
+                      </span>
                     </div>
                   )}
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    <span className="capitalize">
-                      {ad.location === "both"
-                        ? "Online & In-person"
-                        : ad.location}
-                    </span>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3 flex-1 flex flex-col">
+                <div className="flex-1 space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {ad.areas.slice(0, 3).map((area) => (
+                      <Badge key={area} variant="outline">
+                        {area}
+                      </Badge>
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-400 line-clamp-2">
+                    {ad.description}
+                  </p>
+                  <div className="flex items-center gap-4 text-sm text-gray-400">
+                    {ad.pricePerHour && (
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-4 h-4" />
+                        <span>${ad.pricePerHour}/hr</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      <span className="capitalize">
+                        {ad.location === "both"
+                          ? "Online & In-person"
+                          : ad.location}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <Button className="w-full" variant="outline">
+                <Button
+                  className="w-full cursor-pointer bg-gradient-to-br from-blue-600 to-purple-600 mt-auto"
+                  variant="outline"
+                >
                   <MessageSquare className="w-4 h-4 mr-2" />
                   Send Message
                 </Button>
@@ -510,18 +532,10 @@ export function BrowseAds({ user }: BrowseAdsProps) {
                 <p className="text-gray-400">{selectedAd.description}</p>
               </div>
 
-              <div className="flex gap-3">
-                <Button className="flex-1">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Send Message
-                </Button>
-                {selectedAd.type === "tutor" && (
-                  <Button variant="outline" className="flex-1">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Book Session
-                  </Button>
-                )}
-              </div>
+              <Button className="w-full bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Send Message
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
