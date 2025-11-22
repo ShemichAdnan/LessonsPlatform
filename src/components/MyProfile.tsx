@@ -1,31 +1,78 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Badge } from './ui/badge';
-import { Camera, Plus, X } from 'lucide-react';
-import type { User } from '../App';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Badge } from "./ui/badge";
+import { Camera, Plus, X } from "lucide-react";
+import type { User } from "../App";
+import { updateProfile } from "../services/authApi";
 
 interface MyProfileProps {
   user: User;
+  onUserUpdate: (user: User) => void;
 }
 
-export function MyProfile({ user }: MyProfileProps) {
-  const [name, setName] = useState(user.name || '');
-  const [bio, setBio] = useState(user.bio || '');
-  const [city, setCity] = useState(user.city || '');
-  const [experience, setExperience] = useState(user.experience?.toString() || '');
-  const [pricePerHour, setPricePerHour] = useState(user.pricePerHour?.toString() || '');
+export function MyProfile({ user, onUserUpdate }: MyProfileProps) {
+  const [name, setName] = useState(user.name || "");
+  const [bio, setBio] = useState(user.bio || "");
+  const [city, setCity] = useState(user.city || "");
+  const [experience, setExperience] = useState(
+    user.experience?.toString() || ""
+  );
+  const [pricePerHour, setPricePerHour] = useState(
+    user.pricePerHour?.toString() || ""
+  );
   const [subjects, setSubjects] = useState<string[]>(user.subjects || []);
-  const [currentSubject, setCurrentSubject] = useState('');
+  const [currentSubject, setCurrentSubject] = useState("");
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Update local state when user prop changes
+  useEffect(() => {
+    setName(user.name || "");
+    setBio(user.bio || "");
+    setCity(user.city || "");
+    setExperience(user.experience?.toString() || "");
+    setPricePerHour(user.pricePerHour?.toString() || "");
+    setSubjects(user.subjects || []);
+  }, [user]);
+
+  // Track if anything has changed
+  const dirty =
+    name !== user.name ||
+    bio !== (user.bio || "") ||
+    city !== (user.city || "") ||
+    experience !== (user.experience?.toString() || "") ||
+    pricePerHour !== (user.pricePerHour?.toString() || "") ||
+    JSON.stringify(subjects) !== JSON.stringify(user.subjects || []);
+
+  // Track changes per section
+  const basicInfoDirty =
+    name !== user.name ||
+    bio !== (user.bio || "") ||
+    city !== (user.city || "");
+
+  const teachingInfoDirty =
+    experience !== (user.experience?.toString() || "") ||
+    pricePerHour !== (user.pricePerHour?.toString() || "") ||
+    JSON.stringify(subjects) !== JSON.stringify(user.subjects || []);
 
   const handleAddSubject = () => {
     if (currentSubject.trim() && !subjects.includes(currentSubject.trim())) {
       setSubjects([...subjects, currentSubject.trim()]);
-      setCurrentSubject('');
+      setCurrentSubject("");
     }
   };
 
@@ -33,14 +80,55 @@ export function MyProfile({ user }: MyProfileProps) {
     setSubjects(subjects.filter((s) => s !== subject));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock save
-    alert('Profile updated successfully! (This is a demo)');
+  const handleStartSave = () => {
+    if (!dirty) return;
+    setError(null);
+    setShowPasswordPrompt(true);
   };
 
+  const handleConfirmSave = async () => {
+    if (!currentPassword) {
+      setError("Please enter your current password");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      const updated = await updateProfile({
+        name,
+        bio: bio || undefined,
+        city: city || undefined,
+        experience: experience ? parseInt(experience, 10) : undefined,
+        pricePerHour: pricePerHour ? parseInt(pricePerHour, 10) : undefined,
+        subjects: subjects.length > 0 ? subjects : undefined,
+        currentPassword,
+      });
+      onUserUpdate(updated);
+      setShowPasswordPrompt(false);
+      setCurrentPassword("");
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Could not save changes";
+      setError(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelPassword = () => {
+    setShowPasswordPrompt(false);
+    setCurrentPassword("");
+    setError(null);
+  };
+
+  const saveButtonClass = dirty
+    ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+    : "bg-gray-700 text-gray-300 cursor-not-allowed";
+
   return (
-    <div className="h-full overflow-auto bg-gray-900">
+    <div className="h-full overflow-auto bg-gray-900 overflow-scroll no-scrollbar">
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-6">
           <h1 className="text-3xl mb-2">My Profile</h1>
@@ -49,10 +137,12 @@ export function MyProfile({ user }: MyProfileProps) {
 
         <div className="grid gap-6">
           {/* Profile Picture Card */}
-          <Card >
+          <Card>
             <CardHeader>
-              <CardTitle >Profile Picture</CardTitle>
-              <CardDescription >Upload a photo to help others recognize you</CardDescription>
+              <CardTitle>Profile Picture</CardTitle>
+              <CardDescription>
+                Upload a photo to help others recognize you
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-6">
@@ -67,20 +157,34 @@ export function MyProfile({ user }: MyProfileProps) {
                     <Camera className="w-4 h-4 mr-2" />
                     Change Photo
                   </Button>
-                  <p className="text-sm text-gray-400 mt-2">JPG, PNG or GIF. Max size 2MB</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    JPG, PNG or GIF. Max size 2MB
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Basic Information */}
-          <Card >
+          <Card>
             <CardHeader>
-              <CardTitle >Basic Information</CardTitle>
-              <CardDescription >Your personal details</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Basic Information</CardTitle>
+                  <CardDescription>Your personal details</CardDescription>
+                </div>
+                {basicInfoDirty && (
+                  <Badge
+                    variant="outline"
+                    className="text-yellow-500 border-yellow-500/50 bg-yellow-500/10"
+                  >
+                    Unsaved changes
+                  </Badge>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
@@ -120,15 +224,29 @@ export function MyProfile({ user }: MyProfileProps) {
                     rows={4}
                   />
                 </div>
-              </form>
+              </div>
             </CardContent>
           </Card>
 
           {/* Teaching/Learning Information */}
-          <Card >
+          <Card>
             <CardHeader>
-              <CardTitle >Teaching & Learning Information</CardTitle>
-              <CardDescription >Optional details to help others understand your expertise</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Teaching & Learning Information</CardTitle>
+                  <CardDescription>
+                    Optional details to help others understand your expertise
+                  </CardDescription>
+                </div>
+                {teachingInfoDirty && (
+                  <Badge
+                    variant="outline"
+                    className="text-yellow-500 border-yellow-500/50 bg-yellow-500/10"
+                  >
+                    Unsaved changes
+                  </Badge>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -164,7 +282,7 @@ export function MyProfile({ user }: MyProfileProps) {
                     onChange={(e) => setCurrentSubject(e.target.value)}
                     placeholder="e.g., Mathematics, Physics, English"
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         handleAddSubject();
                       }
@@ -177,7 +295,11 @@ export function MyProfile({ user }: MyProfileProps) {
                 {subjects.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
                     {subjects.map((subject) => (
-                      <Badge key={subject} variant="secondary" className="flex items-center gap-1">
+                      <Badge
+                        key={subject}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
                         {subject}
                         <button
                           type="button"
@@ -196,12 +318,78 @@ export function MyProfile({ user }: MyProfileProps) {
 
           {/* Save Button */}
           <div className="flex justify-end">
-            <Button onClick={handleSubmit} size="lg">
-              Save Changes
+            <Button
+              type="button"
+              onClick={handleStartSave}
+              disabled={!dirty || saving}
+              size="lg"
+              className={`${saveButtonClass} disabled:opacity-60`}
+            >
+              {saving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Password Confirmation Modal */}
+      {showPasswordPrompt && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={handleCancelPassword}
+        >
+          <Card
+            className="border-blue-500/50 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader>
+              <CardTitle className="text-lg">Confirm Changes</CardTitle>
+              <CardDescription>
+                Enter your current password to save your profile changes
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="current-password">Current Password</Label>
+                <Input
+                  id="current-password"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter your current password"
+                  className="bg-gray-900 border-gray-600 text-white placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-gray-500 caret-white"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleConfirmSave();
+                    }
+                  }}
+                  autoFocus
+                />
+              </div>
+              {error && <p className="text-sm text-red-400">{error}</p>}
+              <div className="flex gap-3 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancelPassword}
+                  disabled={saving}
+                  className="border-gray-600 text-gray-200 hover:bg-gray-800"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleConfirmSave}
+                  disabled={saving || !currentPassword}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {saving ? "Saving..." : "Confirm & Save"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,6 +12,7 @@ import type { User } from "../App";
 interface DashboardProps {
   user: User;
   onLogout: () => void;
+  onUserUpdate: (user: User) => void;
 }
 
 export type Page =
@@ -23,7 +24,7 @@ export type Page =
   | "ai"
   | "communities";
 
-export function Dashboard({ user, onLogout }: DashboardProps) {
+export function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
   const [currentPage, setCurrentPage] = useState<Page>("browse");
 
   const renderPage = () => {
@@ -31,7 +32,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
       case "browse":
         return <BrowseAds user={user} />;
       case "profile":
-        return <MyProfile user={user} />;
+        return <MyProfile user={user} onUserUpdate={onUserUpdate} />;
       case "create-ad":
         return <CreateAd user={user} />;
       case "bookings":

@@ -48,7 +48,17 @@ function App() {
     return <AuthPage onLogin={handleLogin} />;
   }
 
-  return <Dashboard user={currentUser} onLogout={handleLogout} />;
+  const handleUserUpdate = (updatedUser: User) => {
+    setCurrentUser(updatedUser);
+  };
+
+  return (
+    <Dashboard
+      user={currentUser}
+      onLogout={handleLogout}
+      onUserUpdate={handleUserUpdate}
+    />
+  );
 }
 
 export default App;

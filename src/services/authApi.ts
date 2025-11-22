@@ -23,3 +23,16 @@ export const getCurrentUser = async () => {
     return null;
   }
 };
+
+export const updateProfile = async (data: {
+  name?: string;
+  bio?: string;
+  city?: string;
+  experience?: number;
+  pricePerHour?: number;
+  subjects?: string[];
+  currentPassword: string;
+}) => {
+  const response = await api.put<{ user: User }>('/auth/profile', data);
+  return response.data.user;
+};

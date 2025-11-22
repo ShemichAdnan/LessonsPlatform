@@ -29,7 +29,7 @@ export async function authGuard(req: Request, res: Response, next: NextFunction)
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as any;
     const user = await prisma.user.findUnique({ 
       where: { id: payload.sub }, 
-      select: { id: true, email: true, name: true, role: true }
+      select: { id: true, email: true, name: true }
     });
     
     if (!user) {
@@ -39,7 +39,8 @@ export async function authGuard(req: Request, res: Response, next: NextFunction)
     
     (req as any).user = user;
     next();
-  } catch {
+  } catch (e) {
+    console.error('Auth guard error:', e);
     res.status(401).json({ message: 'Unauthenticated' });
     return;
   }
