@@ -12,9 +12,13 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
-import { Camera, Plus, X } from "lucide-react";
+import { Camera, Plus, X, Key } from "lucide-react";
 import type { User } from "../App";
-import { updateProfile, uploadAvatar } from "../services/authApi";
+import {
+  updateProfile,
+  uploadAvatar,
+  changePassword,
+} from "../services/authApi";
 
 interface MyProfileProps {
   user: User;
@@ -42,6 +46,16 @@ export function MyProfile({ user, onUserUpdate }: MyProfileProps) {
     null
   );
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  // Change password state
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [changePasswordData, setChangePasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // Update local state when user prop changes
   useEffect(() => {
@@ -166,6 +180,100 @@ export function MyProfile({ user, onUserUpdate }: MyProfileProps) {
     setError(null);
   };
 
+  const handleOpenChangePassword = () => {
+    setChangePasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
+    setPasswordError(null);
+    setShowChangePasswordModal(true);
+  };
+
+  const handleCloseChangePassword = () => {
+    setShowChangePasswordModal(false);
+    setChangePasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
+    setPasswordError(null);
+  };
+
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    if (!/[a-z]/.test(password)) {
+      return "Password must contain at least one lowercase letter";
+    }
+    if (!/[0-9]/.test(password)) {
+      return "Password must contain at least one number";
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      return "Password must contain at least one symbol";
+    }
+    return null;
+  };
+
+  const handleChangePassword = async () => {
+    const {
+      currentPassword: current,
+      newPassword,
+      confirmNewPassword,
+    } = changePasswordData;
+
+    if (!current) {
+      setPasswordError("Please enter your current password");
+      return;
+    }
+
+    if (!newPassword) {
+      setPasswordError("Please enter a new password");
+      return;
+    }
+
+    // Validate new password
+    const validationError = validatePassword(newPassword);
+    if (validationError) {
+      setPasswordError(validationError);
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("New passwords do not match");
+      return;
+    }
+
+    setChangingPassword(true);
+    setPasswordError(null);
+    try {
+      await changePassword({
+        currentPassword: current,
+        newPassword,
+      });
+      setShowChangePasswordModal(false);
+      setChangePasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
+      // Show success message (you could use a toast notification here)
+      alert("Password changed successfully!");
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Could not change password";
+      setPasswordError(message);
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const saveButtonClass = dirty
     ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
     : "bg-gray-700 text-gray-300 cursor-not-allowed";
@@ -202,7 +310,7 @@ export function MyProfile({ user, onUserUpdate }: MyProfileProps) {
             <CardContent>
               <div className="flex items-center gap-6">
                 <Avatar className="w-24 h-24">
-                  <AvatarImage
+                  <AvatarImage className="object-contain"
                     src={
                       avatarPreview ||
                       (user.avatarUrl
@@ -391,8 +499,18 @@ export function MyProfile({ user, onUserUpdate }: MyProfileProps) {
             </CardContent>
           </Card>
 
-          {/* Save Button */}
-          <div className="flex justify-end">
+          {/* Action Buttons */}
+          <div className="flex justify-between items-center">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={handleOpenChangePassword}
+              className="border-gray-600 text-gray-200 hover:bg-gray-800 cursor-pointer"
+            >
+              <Key className="w-4 h-4 mr-2" />
+              Change Password
+            </Button>
             <Button
               type="button"
               onClick={handleStartSave}
@@ -459,6 +577,117 @@ export function MyProfile({ user, onUserUpdate }: MyProfileProps) {
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {saving ? "Saving..." : "Confirm & Save"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Change Password Modal */}
+      {showChangePasswordModal && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={handleCloseChangePassword}
+        >
+          <Card
+            className="border-blue-500/50 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader>
+              <CardTitle className="text-lg">Change Password</CardTitle>
+              <CardDescription>
+                Enter your current password and choose a new one
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="change-current-password">
+                  Current Password
+                </Label>
+                <Input
+                  id="change-current-password"
+                  type="password"
+                  value={changePasswordData.currentPassword}
+                  onChange={(e) =>
+                    setChangePasswordData({
+                      ...changePasswordData,
+                      currentPassword: e.target.value,
+                    })
+                  }
+                  placeholder="Enter your current password"
+                  className="bg-gray-900 border-gray-600 text-white placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-gray-500 caret-white"
+                  autoFocus
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={changePasswordData.newPassword}
+                  onChange={(e) =>
+                    setChangePasswordData({
+                      ...changePasswordData,
+                      newPassword: e.target.value,
+                    })
+                  }
+                  placeholder="Enter new password"
+                  className="bg-gray-900 border-gray-600 text-white placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-gray-500 caret-white"
+                />
+                <p className="text-xs text-gray-400">
+                  Min 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 symbol
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-new-password">
+                  Repeat New Password
+                </Label>
+                <Input
+                  id="confirm-new-password"
+                  type="password"
+                  value={changePasswordData.confirmNewPassword}
+                  onChange={(e) =>
+                    setChangePasswordData({
+                      ...changePasswordData,
+                      confirmNewPassword: e.target.value,
+                    })
+                  }
+                  placeholder="Repeat new password"
+                  className="bg-gray-900 border-gray-600 text-white placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-gray-500 caret-white"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleChangePassword();
+                    }
+                  }}
+                />
+              </div>
+              {passwordError && (
+                <p className="text-sm text-red-400">{passwordError}</p>
+              )}
+              <div className="flex gap-3 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseChangePassword}
+                  disabled={changingPassword}
+                  className="border-gray-600 text-gray-200 hover:bg-gray-800"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleChangePassword}
+                  disabled={
+                    changingPassword ||
+                    !changePasswordData.currentPassword ||
+                    !changePasswordData.newPassword ||
+                    !changePasswordData.confirmNewPassword
+                  }
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {changingPassword ? "Changing..." : "Change Password"}
                 </Button>
               </div>
             </CardContent>

@@ -237,4 +237,50 @@ r.post('/avatar', authGuard, avatarUpload.single('avatar'), async (req, res) => 
   }
 });
 
+// Change password endpoint
+const ChangePasswordDto = z.object({
+  currentPassword: z.string().min(1, { message: 'Current password is required' }),
+  newPassword: passwordSchema,
+});
+
+r.put('/change-password', authGuard, async (req, res) => {
+  try {
+    const dto = ChangePasswordDto.parse(req.body);
+    const userId = (req as any).user.id;
+
+    const existing = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { passwordHash: true },
+    });
+
+    if (!existing) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    const ok = await bcrypt.compare(dto.currentPassword, existing.passwordHash);
+    if (!ok) {
+      res.status(401).json({ message: 'Current password is incorrect' });
+      return;
+    }
+
+    const newPasswordHash = await bcrypt.hash(dto.newPassword, 10);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: newPasswordHash },
+    });
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (e) {
+    console.error('Change password error:', e);
+    if (e instanceof z.ZodError) {
+      const issues = e.issues ?? (e as any).errors ?? [];
+      const first = issues[0];
+      res.status(400).json({ message: first?.message ?? 'Invalid input' });
+      return;
+    }
+    res.status(400).json({ message: 'Invalid input' });
+  }
+});
+
 export default r;

@@ -48,3 +48,11 @@ export const uploadAvatar = async (file: File) => {
   });
   return response.data.user;
 };
+
+export const changePassword = async (data: {
+  currentPassword: string;
+  newPassword: string;
+}) => {
+  const response = await api.put<{ message: string }>('/auth/change-password', data);
+  return response.data;
+};

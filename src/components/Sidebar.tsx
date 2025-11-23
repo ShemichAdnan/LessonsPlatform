@@ -81,6 +81,7 @@ export function Sidebar({
         <div className="flex items-center gap-3">
           <Avatar>
             <AvatarImage
+              className="object-contain"
               src={
                 user.avatarUrl
                   ? `http://localhost:4000${user.avatarUrl}`
@@ -93,7 +94,6 @@ export function Sidebar({
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="truncate text-white">{user.name}</div>
-            <div className="text-xs text-gray-400">Member</div>
           </div>
         </div>
         <Button
