@@ -58,25 +58,62 @@ export function BrowseAds({ user }: BrowseAdsProps) {
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  useEffect(() => {
-    fetchAds();
-  }, []);
-
-  const fetchAds = async () => {
+  const fetchAdsWithSearchAndFilters = async () => {
     setLoading(true);
     setError(null);
-    setIsSearching(false);
 
     try {
-      const filters: any = {};
-      if (typeFilter !== "all") filters.type = typeFilter;
-      if (subjectFilter) filters.subject = subjectFilter;
-      if (levelFilter !== "all") filters.level = levelFilter;
-      if (locationFilter !== "all") filters.location = locationFilter;
-      if (cityFilter) filters.city = cityFilter;
+      let fetchedAds: Ad[] = [];
 
-      const fetchedAds = await getAds(filters);
-      setAds(fetchedAds);
+      if (searchQuery.trim()) {
+        fetchedAds = await searchAdsAPI(searchQuery);
+        setIsSearching(true);
+      } else {
+        const filters: any = {};
+        if (typeFilter !== "all") filters.type = typeFilter;
+        if (subjectFilter) filters.subject = subjectFilter;
+        if (levelFilter !== "all") filters.level = levelFilter;
+        if (locationFilter !== "all") filters.location = locationFilter;
+        if (cityFilter) filters.city = cityFilter;
+
+        fetchedAds = await getAds(filters);
+        setIsSearching(false);
+      }
+
+      let filteredAds = fetchedAds;
+
+      if (typeFilter !== "all") {
+        filteredAds = filteredAds.filter((ad) => ad.type === typeFilter);
+      }
+      if (subjectFilter) {
+        filteredAds = filteredAds.filter((ad) =>
+          ad.subject.toLowerCase().includes(subjectFilter.toLowerCase())
+        );
+      }
+      if (levelFilter !== "all") {
+        filteredAds = filteredAds.filter((ad) => ad.level === levelFilter);
+      }
+      if (locationFilter !== "all") {
+        if (locationFilter === "online") {
+          filteredAds = filteredAds.filter(
+            (ad) => ad.location === "online" || ad.location === "both"
+          );
+        } else if (locationFilter === "in-person") {
+          filteredAds = filteredAds.filter(
+            (ad) => ad.location === "in-person" || ad.location === "both"
+          );
+        } else {
+          filteredAds = filteredAds.filter((ad) => ad.location === "both");
+        }
+      }
+      if (cityFilter) {
+        filteredAds = filteredAds.filter(
+          (ad) =>
+            ad.city && ad.city.toLowerCase().includes(cityFilter.toLowerCase())
+        );
+      }
+
+      setAds(filteredAds);
     } catch (err: any) {
       console.error("Error fetching ads:", err);
       setError("Failed to load ads. Please try again later.");
@@ -86,49 +123,22 @@ export function BrowseAds({ user }: BrowseAdsProps) {
   };
 
   useEffect(() => {
-    const timer= setTimeout(() => {
-      if(searchQuery.trim()){
-        handleSearch();
-      }else if(searchQuery==="" && isSearching){
-        handleClearSearch();
-      }
+    const timer = setTimeout(() => {
+      fetchAdsWithSearchAndFilters();
     }, 500);
-    
     return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    if (!isSearching) {
-      fetchAds();
-    }
-  }, [typeFilter, subjectFilter, levelFilter, locationFilter, cityFilter]);
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      setIsSearching(false);
-      fetchAds();
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setIsSearching(true);
-
-    try {
-      const results = await searchAdsAPI(searchQuery);
-      setAds(results);
-    } catch (err: any) {
-      console.error("Search error:", err);
-      setError("Failed to search ads. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [
+    typeFilter,
+    subjectFilter,
+    levelFilter,
+    locationFilter,
+    cityFilter,
+    searchQuery,
+  ]);
 
   const handleClearSearch = () => {
     setSearchQuery("");
     setIsSearching(false);
-    fetchAds();
   };
 
   const handleResetFilters = () => {
@@ -140,12 +150,6 @@ export function BrowseAds({ user }: BrowseAdsProps) {
     setSearchQuery("");
     setIsSearching(false);
     setIsFilterOpen(false);
-  };
-
-  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
   };
 
   const activeFiltersCount =
@@ -174,7 +178,6 @@ export function BrowseAds({ user }: BrowseAdsProps) {
                   placeholder="Search for anything... (e.g., 'Math', 'Calculus', 'John', 'Zagreb')"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleSearchKeyPress}
                   className="pl-10 pr-10"
                 />
                 {searchQuery && (
@@ -186,11 +189,13 @@ export function BrowseAds({ user }: BrowseAdsProps) {
                   </button>
                 )}
               </div>
-              
 
               <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" className="relative cursor-pointer hover:bg-gray-800">
+                  <Button
+                    variant="outline"
+                    className="relative cursor-pointer hover:bg-gray-800"
+                  >
                     <SlidersHorizontal className="w-5 h-5 mr-2" />
                     Filters
                     {activeFiltersCount > 0 && (
@@ -308,23 +313,30 @@ export function BrowseAds({ user }: BrowseAdsProps) {
               </Sheet>
             </div>
 
-            {isSearching && (
-              <div className="mt-3 flex items-center gap-2">
-                <Badge
-                  variant="outline"
-                  className="bg-blue-500/20 text-blue-400 border-blue-500/50"
-                >
-                  🔍 Search active: "{searchQuery}"
-                </Badge>
-                <Button variant="ghost" size="sm" onClick={handleClearSearch}>
-                  Clear search
-                </Button>
-              </div>
-            )}
-
-            {activeFiltersCount > 0 && !isSearching && (
+            {(isSearching || activeFiltersCount > 0) && (
               <div className="mt-3 flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-gray-400">Active filters:</span>
+                {isSearching && (
+                  <>
+                    <Badge
+                      variant="outline"
+                      className="bg-blue-500/20 text-blue-400 border-blue-500/50"
+                    >
+                      🔍 Search: "{searchQuery}"
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearSearch}
+                    >
+                      Clear search
+                    </Button>
+                  </>
+                )}
+                {activeFiltersCount > 0 && (
+                  <span className="text-sm text-gray-400">
+                    {isSearching ? "• Filters:" : "Active filters:"}
+                  </span>
+                )}
                 {typeFilter !== "all" && (
                   <Badge variant="secondary">
                     Type: {typeFilter}
