@@ -268,7 +268,7 @@ export function MyProfile({ user, onUserUpdate }: MyProfileProps) {
     : "bg-gray-700 text-gray-300 cursor-not-allowed";
 
   return (
-    <div className="h-full overflow-auto bg-gray-900 overflow-scroll no-scrollbar">
+    <div className="h-screen overflow-auto bg-gray-900 overflow-scroll no-scrollbar">
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-6">
           <h1 className="text-3xl mb-2">My Profile</h1>

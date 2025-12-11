@@ -137,7 +137,7 @@ export function MyBookings({ user }: MyBookingsProps) {
     const otherPersonName = booking.tutorName;
 
     return (
-      <Card>
+      <Card >
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">

@@ -115,7 +115,7 @@ export function CreateAd({ user }: CreateAdProps) {
   };
 
   return (
-    <div className="h-full overflow-auto bg-gray-900 overflow-scroll no-scrollbar">
+    <div className="h-screen overflow-auto bg-gray-900 overflow-scroll no-scrollbar">
       <div className="max-w-3xl mx-auto p-6">
         <div className="mb-6">
           <h1 className="text-3xl mb-2">Create an Ad</h1>

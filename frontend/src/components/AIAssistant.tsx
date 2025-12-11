@@ -103,7 +103,7 @@ export function AIAssistant({ user }: AIAssistantProps) {
   };
 
   return (
-    <div className="h-full flex bg-gray-900">
+    <div className="h-screen flex bg-gray-900">
       <div className="w-80 border-r border-gray-700 bg-gray-800 p-6 space-y-6">
         <div>
           <div className="flex items-center gap-2 mb-2">

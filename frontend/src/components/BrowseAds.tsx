@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Search, MapPin, DollarSign, BookOpen, X } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  DollarSign,
+  BookOpen,
+  X,
+  SlidersHorizontal,
+} from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import {
@@ -17,6 +24,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
 
 import { getAds, searchAds as searchAdsAPI, type Ad } from "../services/adApi";
 import type { User } from "../App";
@@ -39,6 +54,8 @@ export function BrowseAds({ user }: BrowseAdsProps) {
   const [subjectFilter, setSubjectFilter] = useState("");
   const [levelFilter, setLevelFilter] = useState("all");
   const [locationFilter, setLocationFilter] = useState("all");
+
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     fetchAds();
@@ -78,6 +95,7 @@ export function BrowseAds({ user }: BrowseAdsProps) {
       fetchAds();
       return;
     }
+
     setLoading(true);
     setError(null);
     setIsSearching(true);
@@ -86,8 +104,8 @@ export function BrowseAds({ user }: BrowseAdsProps) {
       const results = await searchAdsAPI(searchQuery);
       setAds(results);
     } catch (err: any) {
-      console.error("Error searching ads:", err);
-      setError("Search failed. Please try again later.");
+      console.error("Search error:", err);
+      setError("Failed to search ads. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -98,6 +116,7 @@ export function BrowseAds({ user }: BrowseAdsProps) {
     setIsSearching(false);
     fetchAds();
   };
+
   const handleResetFilters = () => {
     setTypeFilter("all");
     setSubjectFilter("");
@@ -105,15 +124,23 @@ export function BrowseAds({ user }: BrowseAdsProps) {
     setLocationFilter("all");
     setSearchQuery("");
     setIsSearching(false);
+    setIsFilterOpen(false);
   };
+
   const handleSearchKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
 
+  const activeFiltersCount =
+    (typeFilter !== "all" ? 1 : 0) +
+    (subjectFilter ? 1 : 0) +
+    (levelFilter !== "all" ? 1 : 0) +
+    (locationFilter !== "all" ? 1 : 0);
+
   return (
-    <div className="h-full overflow-auto bg-gray-900 p-6">
+    <div className="bg-gray-900 p-6 h-screen overflow-scroll no-scrollbar">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl mb-2">Browse Ads</h1>
@@ -123,16 +150,7 @@ export function BrowseAds({ user }: BrowseAdsProps) {
         </div>
 
         <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
-              Global Search
-            </CardTitle>
-            <CardDescription>
-              Search across subjects, areas, descriptions, tutors, and locations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -152,9 +170,123 @@ export function BrowseAds({ user }: BrowseAdsProps) {
                   </button>
                 )}
               </div>
-              <Button onClick={handleSearch} disabled={loading}>
+              <Button
+                onClick={handleSearch}
+                disabled={loading}
+                className="px-6 cursor-pointer"
+              >
                 {loading ? "Searching..." : "Search"}
               </Button>
+
+              <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="relative cursor-pointer">
+                    <SlidersHorizontal className="w-5 h-5 mr-2" />
+                    Filters
+                    {activeFiltersCount > 0 && (
+                      <Badge
+                        variant="default"
+                        className="ml-2 px-2 py-0.5 text-xs bg-blue-600"
+                      >
+                        {activeFiltersCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="bg-gray-900 text-white w-full max-w-md">
+                  <SheetHeader>
+                    <SheetTitle>Filter Ads</SheetTitle>
+                    <SheetDescription>
+                      Narrow down your search with filters
+                    </SheetDescription>
+                  </SheetHeader>
+
+                  <div className=" space-y-6 p-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Type</label>
+                      <Select
+                        value={typeFilter}
+                        onValueChange={(v: any) => setTypeFilter(v)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          <SelectItem value="tutor">Tutors</SelectItem>
+                          <SelectItem value="student">Students</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Subject</label>
+                      <Input
+                        placeholder="e.g., Mathematics"
+                        value={subjectFilter}
+                        onChange={(e) => setSubjectFilter(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Level</label>
+                      <Select
+                        value={levelFilter}
+                        onValueChange={setLevelFilter}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="All levels" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All levels</SelectItem>
+                          <SelectItem value="Elementary">Elementary</SelectItem>
+                          <SelectItem value="High School">
+                            High School
+                          </SelectItem>
+                          <SelectItem value="College">College</SelectItem>
+                          <SelectItem value="Professional">
+                            Professional
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Location</label>
+                      <Select
+                        value={locationFilter}
+                        onValueChange={setLocationFilter}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="All locations" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All locations</SelectItem>
+                          <SelectItem value="online">Online</SelectItem>
+                          <SelectItem value="in-person">In-person</SelectItem>
+                          <SelectItem value="both">Both</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="pt-4 space-y-2">
+                      <Button
+                        variant="outline"
+                        onClick={handleResetFilters}
+                        className="w-full cursor-pointer"
+                      >
+                        Reset All Filters
+                      </Button>
+                      <Button
+                        onClick={() => setIsFilterOpen(false)}
+                        className="w-full cursor-pointer"
+                      >
+                        Apply Filters
+                      </Button>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
 
             {isSearching && (
@@ -170,92 +302,58 @@ export function BrowseAds({ user }: BrowseAdsProps) {
                 </Button>
               </div>
             )}
+
+            {activeFiltersCount > 0 && !isSearching && (
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-gray-400">Active filters:</span>
+                {typeFilter !== "all" && (
+                  <Badge variant="secondary">
+                    Type: {typeFilter}
+                    <button
+                      onClick={() => setTypeFilter("all")}
+                      className="ml-1 hover:text-white"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                )}
+                {subjectFilter && (
+                  <Badge variant="secondary">
+                    Subject: {subjectFilter}
+                    <button
+                      onClick={() => setSubjectFilter("")}
+                      className="ml-1 hover:text-white"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                )}
+                {levelFilter !== "all" && (
+                  <Badge variant="secondary">
+                    Level: {levelFilter}
+                    <button
+                      onClick={() => setLevelFilter("all")}
+                      className="ml-1 hover:text-white"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                )}
+                {locationFilter !== "all" && (
+                  <Badge variant="secondary">
+                    Location: {locationFilter}
+                    <button
+                      onClick={() => setLocationFilter("all")}
+                      className="ml-1 hover:text-white"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
-
-        {!isSearching && (
-          <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 mb-6">
-            <CardHeader>
-              <CardTitle>Filters</CardTitle>
-              <CardDescription>
-                Narrow down your search with filters
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Type</label>
-                  <Select
-                    value={typeFilter}
-                    onValueChange={(v: any) => setTypeFilter(v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="tutor">Tutors</SelectItem>
-                      <SelectItem value="student">Students</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Subject</label>
-                  <Input
-                    placeholder="e.g., Mathematics"
-                    value={subjectFilter}
-                    onChange={(e) => setSubjectFilter(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Level</label>
-                  <Select value={levelFilter} onValueChange={setLevelFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All levels" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All levels</SelectItem>
-                      <SelectItem value="Elementary">Elementary</SelectItem>
-                      <SelectItem value="High School">High School</SelectItem>
-                      <SelectItem value="College">College</SelectItem>
-                      <SelectItem value="Professional">Professional</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Location</label>
-                  <Select
-                    value={locationFilter}
-                    onValueChange={setLocationFilter}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="All locations" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All locations</SelectItem>
-                      <SelectItem value="online">Online</SelectItem>
-                      <SelectItem value="in-person">In-person</SelectItem>
-                      <SelectItem value="both">Both</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <Button
-                  variant="outline"
-                  onClick={handleResetFilters}
-                  size="sm"
-                >
-                  Reset Filters
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {loading && (
           <div className="text-center py-12">
@@ -311,7 +409,7 @@ export function BrowseAds({ user }: BrowseAdsProps) {
                         >
                           {ad.type === "tutor" ? "👨‍🏫 Tutor" : "🎓 Student"}
                         </Badge>
-                        {user && user.id === ad.user.id && (
+                        {user && user.id === ad.userId && (
                           <Badge
                             variant="outline"
                             className="bg-green-500/20 text-green-400 border-green-500/50"
