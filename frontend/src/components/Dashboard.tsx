@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FloatingMenu } from "./FloatingMenu";
 import { FloatingCreateAd } from "./FloatingCreateAd";
 import { BrowseAds } from "./BrowseAds";
@@ -8,6 +8,7 @@ import { Messages } from "./Messages";
 import { AIAssistant } from "./AIAssistant";
 import { Communities } from "./Communities";
 import type { User } from "../App";
+import { useState } from "react";
 
 interface DashboardProps {
   user: User;
@@ -24,12 +25,39 @@ export type Page =
   | "communities";
 
 export function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
-  const [currentPage, setCurrentPage] = useState<Page>("browse");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [browseAdsKey, setBrowseAdsKey] = useState(0); // To force remount BrowseAds
+
+  const getCurrentPage = (): Page => {
+    const path = location.pathname;
+    if (path === "/profile") return "profile";
+    if (path === "/bookings") return "bookings";
+    if (path === "/messages") return "messages";
+    if (path === "/ai") return "ai";
+    if (path === "/communities") return "communities";
+    return "browse";
+  };
+
+  const handleNavigate = (page: Page) => {
+    const routes: Record<Page, string> = {
+      browse: "/browse-ads",
+      profile: "/profile",
+      bookings: "/bookings",
+      messages: "/messages",
+      ai: "/ai",
+      communities: "/communities",
+    };
+    navigate(routes[page]);
+  };
+  const handleAdCreated = () => {
+    setBrowseAdsKey((prev) => prev + 1);
+  };
+
+  const currentPage = getCurrentPage();
 
   const renderPage = () => {
     switch (currentPage) {
-      case "browse":
-        return <BrowseAds user={user} />;
       case "profile":
         return <MyProfile user={user} onUserUpdate={onUserUpdate} />;
       case "bookings":
@@ -40,8 +68,9 @@ export function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
         return <AIAssistant user={user} />;
       case "communities":
         return <Communities user={user} />;
+      case "browse":
       default:
-        return <BrowseAds user={user} />;
+        return <BrowseAds key={browseAdsKey} user={user} />;
     }
   };
 
@@ -52,10 +81,12 @@ export function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
         <FloatingMenu
           user={user}
           currentPage={currentPage}
-          onNavigate={setCurrentPage}
+          onNavigate={handleNavigate}
           onLogout={onLogout}
         />
-        <FloatingCreateAd user={user} />
+        {currentPage === "browse" && (
+          <FloatingCreateAd user={user} onAdCreated={handleAdCreated} />
+        )}
       </main>
     </div>
   );

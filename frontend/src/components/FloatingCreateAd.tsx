@@ -25,9 +25,10 @@ import { createAd } from "../services/adApi";
 
 interface FloatingCreateAdProps {
   user: User;
+  onAdCreated?: () => void;
 }
 
-export function FloatingCreateAd({ user }: FloatingCreateAdProps) {
+export function FloatingCreateAd({ user, onAdCreated }: FloatingCreateAdProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [adType, setAdType] = useState<"tutor" | "student">("tutor");
   const [subject, setSubject] = useState("");
@@ -116,10 +117,14 @@ export function FloatingCreateAd({ user }: FloatingCreateAdProps) {
       setSuccess(true);
       resetForm();
 
+      if (onAdCreated) {
+        onAdCreated();
+      }
+
       setTimeout(() => {
         setSuccess(false);
         setIsOpen(false);
-      }, 2000);
+      }, 1000);
     } catch (err: any) {
       console.error("Error creating ad:", err);
       setError(
