@@ -7,6 +7,7 @@ import { MyBookings } from "./MyBookings";
 import { Messages } from "./Messages";
 import { AIAssistant } from "./AIAssistant";
 import { Communities } from "./Communities";
+import {AllProfilesPage} from "./AllProfilesPage";
 import type { User } from "../App";
 import { useState } from "react";
 
@@ -18,6 +19,7 @@ interface DashboardProps {
 
 export type Page =
   | "browse"
+  | "profiles"
   | "profile"
   | "bookings"
   | "messages"
@@ -32,6 +34,7 @@ export function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
   const getCurrentPage = (): Page => {
     const path = location.pathname;
     if (path === "/profile") return "profile";
+    if (path === "/profiles") return "profiles";
     if (path === "/bookings") return "bookings";
     if (path === "/messages") return "messages";
     if (path === "/ai") return "ai";
@@ -42,6 +45,7 @@ export function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
   const handleNavigate = (page: Page) => {
     const routes: Record<Page, string> = {
       browse: "/browse-ads",
+      profiles: "/profiles",
       profile: "/profile",
       bookings: "/bookings",
       messages: "/messages",
@@ -60,6 +64,8 @@ export function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
     switch (currentPage) {
       case "profile":
         return <MyProfile user={user} onUserUpdate={onUserUpdate} />;
+      case "profiles":
+        return <AllProfilesPage user={user} />;
       case "bookings":
         return <MyBookings user={user} />;
       case "messages":

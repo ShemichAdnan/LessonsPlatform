@@ -94,4 +94,5 @@ export const authService = {
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
     await userModel.updatePassword(userId, newPasswordHash);
   },
+  
 };

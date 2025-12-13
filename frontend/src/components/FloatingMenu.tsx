@@ -26,6 +26,7 @@ interface FloatingMenuProps {
 
 const menuItems = [
   { id: "browse" as Page, label: "Browse Ads", icon: Search },
+  { id: "profiles" as Page, label: "All Profiles", icon: Users },
   { id: "bookings" as Page, label: "My Bookings", icon: Calendar },
   { id: "messages" as Page, label: "Messages", icon: MessageSquare },
   { id: "ai" as Page, label: "AI Assistant", icon: Sparkles },

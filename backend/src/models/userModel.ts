@@ -76,4 +76,14 @@ export const userModel = {
       data: { passwordHash },
     });
   },
+
+  async listProfiles() {
+    return prisma.user.findMany({
+      select:{
+        id: true,
+        name: true,
+        avatarUrl: true,
+      }
+    });
+  }
 };
