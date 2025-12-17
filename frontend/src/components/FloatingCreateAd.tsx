@@ -12,13 +12,26 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Badge } from "./ui/badge";
-import { createAd, type CreateAdData } from "../services/adApi";
+import {
+  createAd,
+  getAdById,
+  updateAd,
+  type CreateAdData,
+} from "../services/adApi";
 
 interface FloatingCreateAdProps {
   onAdCreated?: () => void;
+  mode: "create" | "edit";
+  adId?: string;
+  onClose?: () => void;
 }
 
-export function FloatingCreateAd({ onAdCreated }: FloatingCreateAdProps) {
+export function FloatingCreateAd({
+  onAdCreated,
+  mode,
+  adId,
+  onClose,
+}: FloatingCreateAdProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [adType, setAdType] = useState<"tutor" | "student">("tutor");
   const [subject, setSubject] = useState("");
@@ -36,8 +49,35 @@ export function FloatingCreateAd({ onAdCreated }: FloatingCreateAdProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Load ad data when in edit mode
   useEffect(() => {
-    if (isOpen) {
+    const loadAdData = async () => {
+      if (mode === "edit" && adId) {
+        try {
+          setLoading(true);
+          const ad = await getAdById(adId);
+          setAdType(ad.type);
+          setSubject(ad.subject);
+          setAreas(ad.areas);
+          setLevel(ad.level);
+          setPricePerHour(ad.pricePerHour ? ad.pricePerHour.toString() : "");
+          setLocation(ad.location);
+          setCity(ad.city || "");
+          setDescription(ad.description);
+          setAvailableTimes(ad.availableTimes || []);
+        } catch (err: any) {
+          console.error("Error loading ad:", err);
+          setError("Failed to load ad data.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    loadAdData();
+  }, [mode, adId]);
+
+  useEffect(() => {
+    if (isOpen || mode === "edit") {
       const scrollbarWidth =
         window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = "hidden";
@@ -87,6 +127,15 @@ export function FloatingCreateAd({ onAdCreated }: FloatingCreateAdProps) {
     setSuccess(false);
   };
 
+  const handleClose = () => {
+    resetForm();
+    if (mode === "edit" && onClose) {
+      onClose();
+    } else {
+      setIsOpen(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -119,7 +168,12 @@ export function FloatingCreateAd({ onAdCreated }: FloatingCreateAdProps) {
         availableTimes: availableTimes.length > 0 ? availableTimes : undefined,
       };
 
-      await createAd(adData);
+      if (mode === "edit" && adId) {
+        await updateAd(adId, adData);
+      } else {
+        await createAd(adData);
+      }
+
       setSuccess(true);
       resetForm();
 
@@ -129,12 +183,17 @@ export function FloatingCreateAd({ onAdCreated }: FloatingCreateAdProps) {
 
       setTimeout(() => {
         setSuccess(false);
-        setIsOpen(false);
+        handleClose();
       }, 1000);
     } catch (err: any) {
-      console.error("Error creating ad:", err);
+      console.error(
+        mode === "edit" ? "Error updating ad:" : "Error creating ad:",
+        err
+      );
       setError(
-        err.response?.data?.message || err.message || "Failed to create ad."
+        err.response?.data?.message ||
+          err.message ||
+          (mode === "edit" ? "Failed to update ad." : "Failed to create ad.")
       );
     } finally {
       setLoading(false);
@@ -143,28 +202,33 @@ export function FloatingCreateAd({ onAdCreated }: FloatingCreateAdProps) {
 
   return (
     <>
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 flex items-center justify-center text-white transition-all"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
+      {mode === "create" && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 flex items-center justify-center text-white transition-all"
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+      )}
 
-      {isOpen && (
+      {(mode === "edit" || isOpen) && (
         <>
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
           />
 
-          <div className="fixed right-0 top-0 bottom-0  bg-gray-900 text-white border-l border-gray-700 z-50 flex flex-col overflow-y-auto shadow-xl">
+          <div className="fixed right-0 top-0 bottom-0 w-full sm:w-96 max-w-md bg-gray-900 text-white border-l border-gray-700 z-50 flex flex-col overflow-y-auto shadow-xl">
             <div className="p-6 border-b border-gray-700">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-white text-xl font-semibold">
-                  Create an Ad
+                  {mode === "edit" ? "Edit Ad" : "Create an Ad"}
                 </h2>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    onClose?.();
+                  }}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
@@ -194,6 +258,7 @@ export function FloatingCreateAd({ onAdCreated }: FloatingCreateAdProps) {
                 <Select
                   value={adType}
                   onValueChange={(v: "tutor" | "student") => setAdType(v)}
+                  disabled={mode === "edit"}
                 >
                   <SelectTrigger className="bg-gray-900 border-gray-600">
                     <SelectValue />
@@ -402,7 +467,13 @@ export function FloatingCreateAd({ onAdCreated }: FloatingCreateAdProps) {
                 className="w-full bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 cursor-pointer"
                 disabled={loading}
               >
-                {loading ? "Creating Ad..." : "Create Ad"}
+                {loading
+                  ? mode === "edit"
+                    ? "Saving Changes..."
+                    : "Creating Ad..."
+                  : mode === "edit"
+                  ? "Save Changes"
+                  : "Create Ad"}
               </Button>
             </form>
           </div>

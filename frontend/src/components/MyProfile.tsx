@@ -314,36 +314,34 @@ export function MyProfile() {
             >
               {saving ? "Saving..." : "Save Changes"}
             </Button>
-          </div> 
+          </div>
         </div>
       </div>
       <div className="max-w-7xl mx-auto">
         <div className="mb-4">
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Ads ({myAds.length})
-            </h2>
-            <p className="text-gray-400">All my active ads</p>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Ads ({myAds.length})
+          </h2>
+          <p className="text-gray-400">All my active ads</p>
+        </div>
+        {myAds.length === 0 ? (
+          <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700">
+            <CardContent className="py-16">
+              <div className="text-center">
+                <p className="text-gray-400 text-lg">
+                  This user currently has no active ads
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {myAds.map((ad) => (
+              <AdCard key={ad.id} ad={ad} />
+            ))}
           </div>
-         {myAds.length === 0 ? (
-            <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700">
-              <CardContent className="py-16">
-                <div className="text-center">
-                  <p className="text-gray-400 text-lg">
-                    This user currently has no active ads
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {myAds.map((ad) => (
-                <AdCard key={ad.id} ad={ad} />
-              ))}
-            </div>
-          )}
-
+        )}
       </div>
-      
 
       {showPasswordPrompt && (
         <div

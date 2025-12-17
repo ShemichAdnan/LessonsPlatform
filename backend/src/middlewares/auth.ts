@@ -20,13 +20,40 @@ export function setAuthCookies(res: Response, user: { id: string }) {
 }
 
 export async function authGuard(req: Request, res: Response, next: NextFunction) {
-  const token = req.cookies?.accessToken;
+  
+  let token = req.cookies?.accessToken;
+ 
   if (!token) {
-    res.status(401).json({ message: 'Unauthenticated' });
-    return;
+    const refreshToken = req.cookies?.refreshToken;
+    
+    if (!refreshToken) {
+      res.status(401).json({ message: 'Unauthenticated' });
+      return;
+    }
+    
+    try {
+      const refreshPayload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as any;
+      
+      const newAccessToken = sign({ sub: refreshPayload.sub }, process.env.JWT_SECRET!, '15m');
+      
+      res.cookie('accessToken', newAccessToken, { 
+        httpOnly: true, 
+        sameSite: 'lax' as const, 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 15 * 60 * 1000 
+      });
+      
+      token = newAccessToken;
+    } catch (e) {
+      res.status(401).json({ message: 'Unauthenticated' });
+      return;
+    }
   }
+  
+  
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    
     const user = await prisma.user.findUnique({ 
       where: { id: payload.sub }, 
       select: { id: true, email: true, name: true, avatarUrl: true, bio: true, city: true, experience: true, pricePerHour: true, subjects: true }
@@ -40,7 +67,6 @@ export async function authGuard(req: Request, res: Response, next: NextFunction)
     (req as any).user = user;
     next();
   } catch (e) {
-    console.error('Auth guard error:', e);
     res.status(401).json({ message: 'Unauthenticated' });
     return;
   }

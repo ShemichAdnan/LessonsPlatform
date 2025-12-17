@@ -12,7 +12,7 @@ export function DashboardLayout() {
         <Outlet />
 
         <FloatingMenu />
-        {isBrowsePage && <FloatingCreateAd />}
+        {isBrowsePage && <FloatingCreateAd mode="create" />}
       </main>
     </div>
   );
