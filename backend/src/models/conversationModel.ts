@@ -108,6 +108,9 @@ export async function getUserConversations(userId: string) {
                         }
                     }
                 }   
+            },
+            _count:{
+                select:{messages:true}
             }
         },
         orderBy: {

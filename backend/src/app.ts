@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import adRoutes from './routes/adRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +18,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
+//frontend
 app.use(cors({
   origin: ['http://localhost:5000', 'http://localhost:5001'],
   credentials: true
@@ -30,6 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/profiles',profileRoutes)
+app.use('/api/messages', messageRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });

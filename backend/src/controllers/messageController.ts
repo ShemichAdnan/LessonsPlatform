@@ -71,7 +71,7 @@ export async function deleteMessageHandler(req: Request, res: Response) {
         const messageId=req.params.messageId;
         const userId=(req as any).user.id;
 
-        const result= await messageService.deleteMessageById(messageId,userId);
+        await messageService.deleteMessageById(messageId,userId);
         res.json({success: true, message: "Message deleted"});
     } catch (err: any) {
         res.status(400).json({ message: err.message });
@@ -95,9 +95,21 @@ export async function archiveConversationHandler(req: Request, res: Response) {
         const conversationId=req.params.conversationId;
         const userId=(req as any).user.id;
 
-        const result= await messageService.archiveConversationById(conversationId, userId);
+        await messageService.archiveConversationById(conversationId, userId);
 
         res.json({ success: true, message: 'Conversation archived'});
+    } catch (err: any) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+export async function unarchiveConversationHandler(req: Request, res: Response) {
+    try{
+        const conversationId=req.params.conversationId;
+        const userId=(req as any).user.id;
+        await messageService.unarchiveConversationById(conversationId, userId);
+
+        res.json({ success: true, message: 'Conversation unarchived'});
     } catch (err: any) {
         res.status(400).json({ message: err.message });
     }

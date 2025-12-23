@@ -64,6 +64,10 @@ export async function archiveConversationById(conversationId: string, userId: st
     await conversationModel.getConversationById(conversationId,userId);
     return await conversationModel.archiveConversation(conversationId, userId);
 }
+export async function unarchiveConversationById(conversationId: string, userId: string) {
+    await conversationModel.getConversationById(conversationId,userId);
+    return await conversationModel.unarchiveConversation(conversationId, userId);
+}
 
 export async function deleteMessageById(messageId: string, userId: string) {
     return await messageModel.deleteMessage(messageId, userId);
