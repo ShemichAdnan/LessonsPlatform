@@ -32,7 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/profiles',profileRoutes)
-app.use('/api/messages', messageRoutes);
+app.use('/conversations', messageRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });

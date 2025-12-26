@@ -1,128 +1,84 @@
-import { useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { Search, Send, Paperclip, MoreVertical } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
+import { useAuth } from "../contexts/AuthContext";
+import { useSocket } from "../contexts/SocketContext";
+import * as messageServices from "../services/messageServices";
 
 interface Message {
   id: string;
   conversationId: string;
   senderId: string;
-  text: string;
-  timestamp: string;
+  content:string;
+  createdAt: string;
+  isRead: boolean;
+  isEdited: boolean;
 }
 
 interface Conversation {
   id: string;
-  participantId: string;
-  participantName: string;
-  participantAvatar?: string;
-  lastMessage: string;
-  lastMessageTime: string;
-  unreadCount: number;
-  online: boolean;
+  participants: any[];
+  messages: Message[];
+  lastMessage?: string;
+  lastMessageTime?: string;
+  unreadCount?: number;
+  online?: boolean;
 }
 
-const mockConversations: Conversation[] = [
-  {
-    id: "1",
-    participantId: "1",
-    participantName: "Sarah Johnson",
-    lastMessage: "Great! See you on Monday at 5 PM",
-    lastMessageTime: "10:30 AM",
-    unreadCount: 2,
-    online: true,
-  },
-  {
-    id: "2",
-    participantId: "4",
-    participantName: "Alex Chen",
-    lastMessage: "I can help you with that React problem",
-    lastMessageTime: "Yesterday",
-    unreadCount: 0,
-    online: false,
-  },
-  {
-    id: "3",
-    participantId: "6",
-    participantName: "John Smith",
-    lastMessage: "Thank you for the lesson!",
-    lastMessageTime: "Nov 13",
-    unreadCount: 0,
-    online: false,
-  },
-];
-
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    conversationId: "1",
-    senderId: "1",
-    text: "Hi! I saw your ad for math tutoring. Are you available this Monday?",
-    timestamp: "2025-11-15T10:00:00",
-  },
-  {
-    id: "2",
-    conversationId: "1",
-    senderId: "current",
-    text: "Yes, I have availability on Monday. What time works for you?",
-    timestamp: "2025-11-15T10:15:00",
-  },
-  {
-    id: "3",
-    conversationId: "1",
-    senderId: "1",
-    text: "Would 5 PM work? I need help with calculus.",
-    timestamp: "2025-11-15T10:20:00",
-  },
-  {
-    id: "4",
-    conversationId: "1",
-    senderId: "current",
-    text: "Perfect! 5 PM on Monday works great. We can do it online via Zoom.",
-    timestamp: "2025-11-15T10:25:00",
-  },
-  {
-    id: "5",
-    conversationId: "1",
-    senderId: "1",
-    text: "Great! See you on Monday at 5 PM",
-    timestamp: "2025-11-15T10:30:00",
-  },
-];
 
 export function Messages() {
-  const [conversations] = useState<Conversation[]>(mockConversations);
-  const [selectedConversation, setSelectedConversation] =
-    useState<Conversation | null>(conversations[0]);
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  /*const {currentUser}=useAuth()
+  const {socket}=useSocket()
+  
+  const [conversations,setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] =useState<Conversation | null>();
+  const [messages, setMessages] = useState<Message[]>();
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const typingTimeout=useRef<ReturnType<typeof setTimeout>| null>(null);
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation) return;
-
-    const message: Message = {
-      id: Date.now().toString(),
-      conversationId: selectedConversation.id,
-      senderId: "current",
-      text: newMessage,
-      timestamp: new Date().toISOString(),
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const data= await messageServices.getConversations();
+        setConversations(data.conversations || data);
+      } catch (err) {
+        console.error("Failed to fetch conversations:", err);
+      }
     };
+    fetchConversations();
+  }, []);
 
-    setMessages([...messages, message]);
-    setNewMessage("");
-  };
+  useEffect(() => {
+    if(!selectedConversation || !socket) return;
 
-  const filteredConversations = conversations.filter((conv) =>
-    conv.participantName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    const fetchMessages = async () => {
+      try {
+        const data = await messageServices.getConversationMessages(selectedConversation.id);
+        setMessages(data.messages || data);
+      } catch (err) {
+        console.error("Failed to fetch messages:", err);
+      }
+    };
+    fetchMessages();
 
-  const conversationMessages = messages.filter(
-    (msg) => msg.conversationId === selectedConversation?.id
-  );
+    socket.emit('joinConversation', selectedConversation.id);
+
+    socket.on("newMessage", (message: Message) => {
+      setMessages((prev)=>[...prev, message])
+    });
+
+    socket.on("typing",({}))
+
+
+
+
+
+
 
   return (
     <div className="h-full flex bg-gray-800">
@@ -278,5 +234,5 @@ export function Messages() {
         </div>
       )}
     </div>
-  );
+  );*/return <div>Messages Component</div>;
 }

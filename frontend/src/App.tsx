@@ -11,6 +11,7 @@ import { Messages } from "./components/Messages";
 import { AIAssistant } from "./components/AIAssistant";
 import { Communities } from "./components/Communities";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { SocketProvider } from "./contexts/SocketContext";
 
 export interface User {
   id: string;
@@ -54,42 +55,44 @@ function App() {
 
 function AppContent() {
   const { currentUser, login } = useAuth();
+  if(!currentUser) {
+    return (
+      <Routes>
+        <Route path="login"
+        element={<AuthPage onLogin={login} />} 
+        />
 
-  return (
-    <Routes>
-      
-      <Route
-        path="/login"
-        element={
-          currentUser ? (
-            <Navigate to="/browse" replace />
-          ) : (
-            <AuthPage onLogin={login} />
-          )
-        }
-      />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+  return ( 
+    <SocketProvider userId={currentUser.id}>
+      <Routes>
+        <Route path="/login" element={<Navigate to="/browse" replace />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+        
+          <Route index element={<Navigate to="/browse" replace />} />
+          <Route path="browse" element={<BrowseAds />} />
+          <Route path="profile" element={<MyProfile />} />
+          <Route path="profiles" element={<AllProfilesPage />} />
+          <Route path="profiles/:userId" element={<UserProfilePage />} />
+          <Route path="ads/:adId" element={<AdPage />} />
+          <Route path="messages" element={<Messages />} />
+          <Route path="ai" element={<AIAssistant />} />
+          <Route path="communities" element={<Communities />} />
+        </Route>
 
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="/browse" replace />} />
-        <Route path="browse" element={<BrowseAds />} />
-        <Route path="profile" element={<MyProfile />} />
-        <Route path="profiles" element={<AllProfilesPage />} />
-        <Route path="profiles/:userId" element={<UserProfilePage />} />
-        <Route path="ads/:adId" element={<AdPage />} />
-        <Route path="messages" element={<Messages />} />
-        <Route path="ai" element={<AIAssistant />} />
-        <Route path="communities" element={<Communities />} />
-      </Route>
-
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </SocketProvider>
   );
 }
 
