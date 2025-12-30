@@ -186,7 +186,7 @@ export function FloatingCreateAd({
       {mode === "create" && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 flex items-center justify-center text-white transition-all"
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg shadow-sunglow-500/20 bg-gradient-to-br from-sunglow-400 to-sunglow-600 hover:from-sunglow-300 hover:to-sunglow-500 flex items-center justify-center text-background transition-all hover:scale-105"
         >
           <Plus className="h-6 w-6" />
         </button>
@@ -194,28 +194,25 @@ export function FloatingCreateAd({
 
       {(mode === "edit" || isOpen) && (
         <>
-          <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-            onClick={handleClose}
-          />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={handleClose} />
 
-          <div className="fixed right-0 top-0 bottom-0 w-full sm:w-96 max-w-md bg-gray-900 text-white border-l border-gray-700 z-50 flex flex-col overflow-y-auto shadow-xl">
-            <div className="p-6 border-b border-gray-700">
+          <div className="fixed right-0 top-0 bottom-0 w-full sm:w-96 max-w-md bg-gray2 text-sunglow-50 border-l border-gray1 z-50 flex flex-col overflow-y-auto shadow-xl">
+            <div className="p-6 border-b border-gray1">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-white text-xl font-semibold">
+                <h2 className="text-sunglow-100 text-xl font-semibold">
                   {mode === "edit" ? "Edit Ad" : "Create an Ad"}
                 </h2>
                 <button
                   onClick={() => {
-                    setIsOpen(false);
-                    onClose?.();
+                    setIsOpen(false)
+                    onClose?.()
                   }}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-sunglow-200/60 hover:text-sunglow-300 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-sunglow-200/60 text-sm">
                 {adType === "tutor"
                   ? "Let students know about your tutoring services"
                   : "Describe what kind of tutor you are looking for"}
@@ -223,32 +220,33 @@ export function FloatingCreateAd({
             </div>
 
             {success && (
-              <div className="mt-4 p-3 bg-green-500/10 border border-green-500/50 rounded-lg">
-                <p className="text-green-400 text-center text-sm font-medium">
-                  ✓ Ad created successfully!
-                </p>
+              <div className="mt-4 mx-5 p-3 bg-sunglow-500/10 border border-sunglow-400/30 rounded-lg">
+                <p className="text-sunglow-300 text-center text-sm font-medium">Ad created successfully!</p>
               </div>
             )}
 
-            <form
-              onSubmit={handleSubmit}
-              className="mt-6 space-y-5 pl-5 pr-5 pb-10"
-            >
+            <form onSubmit={handleSubmit} className="mt-6 space-y-5 pl-5 pr-5 pb-10">
               <div className="space-y-2">
-                <Label>I want to...</Label>
+                <Label className="text-sunglow-100">I want to...</Label>
                 <Select
                   value={adType}
                   onValueChange={(v: "tutor" | "student") => setAdType(v)}
                   disabled={mode === "edit"}
                 >
-                  <SelectTrigger className="bg-gray-900 border-gray-600">
+                  <SelectTrigger className="bg-background border-gray1 text-sunglow-100 focus:border-sunglow-400 focus:ring-sunglow-400/20">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="tutor">
+                  <SelectContent className="bg-gray2 border-gray1">
+                    <SelectItem
+                      value="tutor"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
                       Offer lessons (I'm a tutor)
                     </SelectItem>
-                    <SelectItem value="student">
+                    <SelectItem
+                      value="student"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
                       Find a tutor (I'm looking for lessons)
                     </SelectItem>
                   </SelectContent>
@@ -256,19 +254,23 @@ export function FloatingCreateAd({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="subject">Subject *</Label>
+                <Label htmlFor="subject" className="text-sunglow-100">
+                  Subject *
+                </Label>
                 <Input
                   id="subject"
                   placeholder="e.g., Mathematics, English, Programming"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="bg-gray-900 border-gray-600"
+                  className="bg-background border-gray1 text-sunglow-100 placeholder:text-sunglow-200/40 focus:border-sunglow-400 focus:ring-sunglow-400/20"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="areas">Specific Areas *</Label>
+                <Label htmlFor="areas" className="text-sunglow-100">
+                  Specific Areas *
+                </Label>
                 <div className="flex gap-2">
                   <Input
                     id="areas"
@@ -277,17 +279,17 @@ export function FloatingCreateAd({
                     onChange={(e) => setCurrentArea(e.target.value)}
                     onKeyPress={(e) => {
                       if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddArea();
+                        e.preventDefault()
+                        handleAddArea()
                       }
                     }}
-                    className="bg-gray-900 border-gray-600"
+                    className="bg-background border-gray1 text-sunglow-100 placeholder:text-sunglow-200/40 focus:border-sunglow-400 focus:ring-sunglow-400/20"
                   />
                   <Button
                     type="button"
                     onClick={handleAddArea}
                     size="icon"
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-sunglow-500 hover:bg-sunglow-400 text-background"
                   >
                     <Plus className="w-4 h-4" />
                   </Button>
@@ -297,14 +299,13 @@ export function FloatingCreateAd({
                     {areas.map((area) => (
                       <Badge
                         key={area}
-                        variant="secondary"
-                        className="flex items-center gap-1"
+                        className="flex items-center gap-1 bg-sunglow-500/15 text-sunglow-300 border border-sunglow-400/30 hover:bg-sunglow-500/20"
                       >
                         {area}
                         <button
                           type="button"
                           onClick={() => handleRemoveArea(area)}
-                          className="hover:text-red-600"
+                          className="hover:text-sunglow-100 transition-colors"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -315,22 +316,46 @@ export function FloatingCreateAd({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="level">Level *</Label>
+                <Label htmlFor="level" className="text-sunglow-100">
+                  Level *
+                </Label>
                 <Select value={level} onValueChange={setLevel} required>
-                  <SelectTrigger className="bg-gray-900 border-gray-600">
+                  <SelectTrigger className="bg-background border-gray1 text-sunglow-100 focus:border-sunglow-400 focus:ring-sunglow-400/20">
                     <SelectValue placeholder="Select level" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Elementary">Elementary</SelectItem>
-                    <SelectItem value="High School">High School</SelectItem>
-                    <SelectItem value="College">College</SelectItem>
-                    <SelectItem value="Professional">Professional</SelectItem>
+                  <SelectContent className="bg-gray2 border-gray1">
+                    <SelectItem
+                      value="Elementary"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
+                      Elementary
+                    </SelectItem>
+                    <SelectItem
+                      value="High School"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
+                      High School
+                    </SelectItem>
+                    <SelectItem
+                      value="College"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
+                      College
+                    </SelectItem>
+                    <SelectItem
+                      value="Professional"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
+                      Professional
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price per Hour (USD)</Label>
+                <Label htmlFor="price" className="text-sunglow-100">
+                  Price per Hour (USD)
+                </Label>
                 <Input
                   id="price"
                   type="number"
@@ -338,22 +363,35 @@ export function FloatingCreateAd({
                   value={pricePerHour}
                   onChange={(e) => setPricePerHour(e.target.value)}
                   min="0"
-                  className="bg-gray-900 border-gray-600"
+                  className="bg-background border-gray1 text-sunglow-100 placeholder:text-sunglow-200/40 focus:border-sunglow-400 focus:ring-sunglow-400/20"
                 />
               </div>
 
-            
-
               <div className="space-y-2">
-                <Label htmlFor="location">Location Type *</Label>
+                <Label htmlFor="location" className="text-sunglow-100">
+                  Location Type *
+                </Label>
                 <Select value={location} onValueChange={setLocation} required>
-                  <SelectTrigger className="bg-gray-900 border-gray-600">
+                  <SelectTrigger className="bg-background border-gray1 text-sunglow-100 focus:border-sunglow-400 focus:ring-sunglow-400/20">
                     <SelectValue placeholder="Select location type" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="online">Online only</SelectItem>
-                    <SelectItem value="in-person">In-person only</SelectItem>
-                    <SelectItem value="both">
+                  <SelectContent className="bg-gray2 border-gray1">
+                    <SelectItem
+                      value="online"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
+                      Online only
+                    </SelectItem>
+                    <SelectItem
+                      value="in-person"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
+                      In-person only
+                    </SelectItem>
+                    <SelectItem
+                      value="both"
+                      className="text-sunglow-100 focus:bg-sunglow-500/10 focus:text-sunglow-200"
+                    >
                       Both online and in-person
                     </SelectItem>
                   </SelectContent>
@@ -362,19 +400,23 @@ export function FloatingCreateAd({
 
               {(location === "in-person" || location === "both") && (
                 <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city" className="text-sunglow-100">
+                    City
+                  </Label>
                   <Input
                     id="city"
                     placeholder="e.g., New York"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="bg-gray-900 border-gray-600"
+                    className="bg-background border-gray1 text-sunglow-100 placeholder:text-sunglow-200/40 focus:border-sunglow-400 focus:ring-sunglow-400/20"
                   />
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description *</Label>
+                <Label htmlFor="description" className="text-sunglow-100">
+                  Description *
+                </Label>
                 <Textarea
                   id="description"
                   placeholder={
@@ -385,20 +427,20 @@ export function FloatingCreateAd({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={6}
-                  className="bg-gray-900 border-gray-600 resize-none"
+                  className="bg-background border-gray1 text-sunglow-100 placeholder:text-sunglow-200/40 resize-none focus:border-sunglow-400 focus:ring-sunglow-400/20"
                   required
                 />
               </div>
 
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-lg">
-                  <p className="text-red-400 text-center text-sm">{error}</p>
+                <div className="p-3 bg-sunglow-500/10 border border-sunglow-400/30 rounded-lg">
+                  <p className="text-sunglow-300 text-center text-sm">{error}</p>
                 </div>
               )}
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 cursor-pointer"
+                className="w-full bg-gradient-to-r from-sunglow-500 to-sunglow-600 hover:from-sunglow-400 hover:to-sunglow-500 text-background font-semibold cursor-pointer transition-all"
                 disabled={loading}
               >
                 {loading
@@ -406,13 +448,13 @@ export function FloatingCreateAd({
                     ? "Saving Changes..."
                     : "Creating Ad..."
                   : mode === "edit"
-                  ? "Save Changes"
-                  : "Create Ad"}
+                    ? "Save Changes"
+                    : "Create Ad"}
               </Button>
             </form>
           </div>
         </>
       )}
     </>
-  );
+  )
 }
