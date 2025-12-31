@@ -87,6 +87,7 @@ export const userModel = {
         avatarUrl: true,
         bio: true,
         email: true,
+        subjects: true,
       }
     });
   }

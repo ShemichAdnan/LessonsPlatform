@@ -66,11 +66,11 @@ export function AuthPage({ onLogin }: AuthPageProps) {
       className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: `url(${AuthBG})` }}
     >
-      <div className="absolute inset-0 bg-black/50"></div>
+      <div className="absolute inset-0 bg-background/50"></div>
       <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center relative z-10">
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sunglow-400 to-sunglow-600 flex items-center justify-center shadow-lg shadow-sunglow-500/20">
               <GraduationCap className="w-7 h-7 text-white" />
             </div>
             <span className="text-2xl font-semibold text-white">
@@ -79,7 +79,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
           </div>
           <h1 className="text-5xl font-bold text-white">
             Find Your Perfect{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sunglow-300 to-sunglow-500">
               Tutor
             </span>
           </h1>
@@ -89,24 +89,24 @@ export function AuthPage({ onLogin }: AuthPageProps) {
           </p>
           <div className="grid grid-cols-2 gap-4 pt-4">
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-white">10,000+</div>
+              <div className="text-3xl font-bold text-white">100+</div>
               <div className="text-sm font-medium text-gray-400">
                 Active Tutors
               </div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-white">50,000+</div>
+              <div className="text-3xl font-bold text-white">500+</div>
               <div className="text-sm font-medium text-gray-400">Students</div>
             </div>
           </div>
         </div>
 
-        <Card className="shadow-xl bg-gray-800/40 border-gray-700/50 backdrop-blur-md">
+        <Card className="shadow-xl bg-gray2/30 border-gray-700/50 backdrop-blur-md">
           <CardHeader>
-            <CardTitle className="text-white">
+            <CardTitle className="text-sunglow-50">
               {authMode === "login" ? "Welcome Back" : "Get Started"}
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-sunglow-100/60">
               {authMode === "login"
                 ? "Log in to your account to continue"
                 : "Create an account to start learning or teaching"}
@@ -165,7 +165,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-sunglow-400 to-sunglow-500 hover:from-sunglow-500 hover:to-sunglow-600 text-background font-semibold disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-sunglow-500/20 transition-all"
                   >
                     {loading && authMode === "login"
                       ? "Logging in..."
@@ -246,7 +246,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-sunglow-400 to-sunglow-500 hover:from-sunglow-500 hover:to-sunglow-600 text-background font-semibold disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-sunglow-500/20 transition-all"
                   >
                     {loading && authMode === "register"
                       ? "Creating account..."

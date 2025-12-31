@@ -90,7 +90,6 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
         className="group relative overflow-hidden bg-gray2 border-gray1/50 hover:border-sunglow-400/40 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-sunglow-400/10 hover:-translate-y-1 rounded-xl"
       >
         <CardHeader className="pb-2">
-          {/* Type badge and price row */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Badge
@@ -118,17 +117,14 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
             )}
           </div>
 
-          {/* Title */}
           <CardTitle className="text-xl text-sunglow-50 mb-2 group-hover:text-sunglow-300 transition-colors font-bold">
             {ad.subject}
           </CardTitle>
 
-          {/* Description */}
           <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">{ad.description}</p>
         </CardHeader>
 
         <CardContent className="space-y-3 pt-2">
-          {/* Subject and Level */}
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             <BookOpen className="w-4 h-4 text-sunglow-400" />
             {ad.areas.slice(0, 4).map((area, index) => (
@@ -142,7 +138,6 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
             <span className="text-sunglow-200 bg-sunglow-500/10 px-2 py-0.5 rounded-full text-xs">{ad.level}</span>
           </div>
 
-          {/* Location */}
           <div className="flex items-center gap-2 text-sm">
             <MapPin className="w-4 h-4 text-sunglow-400" />
             <span className="text-sunglow-200">
@@ -152,7 +147,6 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
             </span>
           </div>
 
-          {/* User info with avatar */}
           <div className="flex items-center gap-3 pt-3 border-t border-gray1/50">
             <Avatar className="size-10 ring-2 ring-sunglow-400/30">
               {ad.user.avatarUrl ? (

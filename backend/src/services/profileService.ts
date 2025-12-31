@@ -22,6 +22,8 @@ export const getAllProfiles = async (): Promise<Profile[]> => {
             email: u.email,
             avatarUrl: u.avatarUrl && u.avatarUrl.trim() !== '' ? u.avatarUrl : null,
             bio: u.bio,
+            subjects: u.subjects as string[] | null,
+
         }));
     } catch (error) {
         throw new Error('Failed to fetch profiles');

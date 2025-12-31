@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { getAllProfiles } from "../services/profileServices";
-import { Search, Users, Loader2, AlertCircle } from "lucide-react";
+import { Search, Users, Loader2, AlertCircle, X } from "lucide-react";
 import { Input } from "./ui/input";
 import { Card, CardContent } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import type { User } from "../App";
 import { useAuth } from "../contexts/AuthContext";
@@ -45,82 +47,142 @@ export const AllProfilesPage = () => {
       .toUpperCase()
       .slice(0, 2);
   };
+  const handleClearSearch = () => {
+    setSearchQuery("");
+  };
 
   return (
-    <div className="bg-gray-900 p-6 ">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl mb-2 text-white">All Profiles</h1>
-          <p className="text-gray-400">
+    <div className="min-h-screen bg-background">
+      <div className="px-6 py-8">
+        <div className="text-center mb-10 pt-6">
+          <h1 className="text-4xl font-bold mb-3 text-sunglow-50">
+            All Profiles
+          </h1>
+          <p className="text-muted-foreground text-lg">
             Browse profiles of all teachers and find the perfect match for your
             needs
           </p>
         </div>
 
-        <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 mb-6">
-          <CardContent className="pt-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+
+         <div className="max-w-3xl mx-auto mb-10">
+          <div className="relative flex items-center bg-gray2 rounded-full border border-gray1 shadow-lg shadow-sunglow-950/20 p-2">
+            <div className="flex items-center flex-1 pl-4">
+              <Search className="w-5 h-5 text-sunglow-400" />
               <Input
-                type="text"
                 placeholder="Search by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
+                className="border-0 bg-transparent text-sunglow-50 placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
               />
+              {searchQuery && (
+                <button
+                  onClick={handleClearSearch}
+                  className="text-muted-foreground hover:text-sunglow-300 transition-colors mr-2"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
-            {searchQuery && (
-              <p className="mt-3 text-sm text-gray-400">
-                Found {filteredProfiles.length}{" "}
-                {filteredProfiles.length === 1 ? "profile" : "profiles"}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+            <Button className="rounded-full bg-gradient-to-r from-sunglow-500 to-sunglow-600 hover:from-sunglow-400 hover:to-sunglow-500 text-background font-semibold cursor-pointer transition-all px-6">
+              Search
+            </Button>
+          </div>
+
+          {searchQuery && (
+            <div className="mt-4 flex items-center gap-2 flex-wrap justify-center">
+              <Badge
+                variant="outline"
+                className="bg-sunglow-500/20 text-sunglow-300 border-sunglow-500/50"
+              >
+                Search: "{searchQuery}"
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearSearch}
+                className="text-sunglow-400 hover:text-sunglow-300 hover:bg-sunglow-500/10"
+              >
+                Clear search
+              </Button>
+            </div>
+          )}
+        </div>
+
 
         {loading && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-            <p className="text-gray-400">Loading profiles...</p>
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sunglow-500"></div>
+            <p className="mt-4 text-muted-foreground">Loading profiles...</p>
           </div>
         )}
 
         {error && (
-          <Card className="bg-red-900/20 border-red-800">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-400" />
-                <p className="text-red-400">{error}</p>
+          <Card className="bg-sunglow-500/10 border-sunglow-500/30 max-w-3xl mx-auto mb-6">
+            <CardContent className="pt-6 pb-6">
+              <div className="flex items-center justify-center gap-3">
+                <AlertCircle className="w-5 h-5 text-sunglow-400" />
+                <p className="text-sunglow-300 text-center">{error}</p>
               </div>
             </CardContent>
           </Card>
         )}
 
+
         {!loading && !error && (
           <>
-            {filteredProfiles.length === 0 ? (
-              <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700">
-                <CardContent className="py-16">
-                  <div className="text-center">
-                    <Users className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-400 text-lg">
-                      {searchQuery
-                        ? "No profiles match your search"
-                        : "No profiles available"}
-                    </p>
+            {filteredProfiles.length !== 0 && (
+              
+
+              <div className="flex items-center gap-3 mb-6 max-w-6xl mx-auto">
+                  <div className="p-2 rounded-xl bg-sunglow-500/15 border border-sunglow-500/30">
+                    <Users className="w-5 h-5 text-sunglow-400" />
                   </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-sunglow-50">
+                      Found <span className="text-sunglow-400">({filteredProfiles.length})</span> {filteredProfiles.length === 1 ? "profile" : "profiles"}  
+                    </h2>
+                    <p className="text-sunglow-200/60 text-sm">All active users</p>
+                  </div>
+                </div>
+            )}
+
+            {filteredProfiles.length === 0 ? (
+              <Card className="border-transparent max-w-6xl mx-auto">
+                <CardContent className="pt-6 text-center py-12">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-sunglow-500/10 flex items-center justify-center">
+                    <Users className="w-10 h-10 text-sunglow-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-sunglow-100">
+                    No profiles found
+                  </h3>
+                  <p className="text-sunglow-200/70 mb-4">
+                    {searchQuery
+                      ? `No results for "${searchQuery}". Try different keywords.`
+                      : "No profiles available at the moment."}
+                  </p>
+                  {searchQuery && (
+                    <Button
+                      variant="outline"
+                      onClick={handleClearSearch}
+                      className="border-sunglow-500/30 text-sunglow-300 hover:bg-sunglow-500/10 hover:text-sunglow-200 bg-transparent"
+                    >
+                      Clear search
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-6xl mx-auto">
                 {filteredProfiles.map((profile) => (
                   <Card
                     key={profile.id}
                     onClick={() => navigate(`/profiles/${profile.id}`)}
-                    className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer group"
+                    className="bg-gray2 border-gray1 hover:border-sunglow-500/50 overflow-hidden hover:border-sunglow-400/40 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-sunglow-400/10 hover:-translate-y-1 rounded-xl"
                   >
-                    <CardContent className="p-6 flex flex-col items-center">
-                      <div className="w-24 h-24 rounded-full overflow-hidden mb-4 ring-4 ring-gray-700 group-hover:ring-blue-500/50 transition-all">
+                    <CardContent className="p-0 flex flex-col">
+                      
+                      <div className="relative h-42 w-full overflow-hidden ">
                         {profile.avatarUrl ? (
                           <img
                             src={
@@ -128,20 +190,39 @@ export const AllProfilesPage = () => {
                                 ? profile.avatarUrl
                                 : `http://localhost:4000${profile.avatarUrl}`
                             }
-                            className="w-full h-full object-cover"
+                            alt={profile.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                            <span className="text-white text-2xl font-semibold">
-                              {getInitials(profile.name)}
-                            </span>
+                          <div className="w-full h-full bg-gradient-to-br from-sunglow-500/80 to-sunglow-600/60 flex items-center justify-center">
+                            <span className="text-sunglow-950 text-5xl font-bold">{getInitials(profile.name)}</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-gray2 to-transparent" />
+                      </div>
+                      <div className="p-4 pt-2 flex flex-col items-center ">
+                        <h3 className="text-lg font-semibold text-sunglow-50 text-center hover:text-sunglow-400 transition-colors mb-2">
+                          {profile.name}
+                        </h3>
+                        {profile.subjects && profile.subjects.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 justify-center">
+                            {profile.subjects.slice(0, 3).map((subject, index) => (
+                              <Badge
+                                key={index}
+                                variant="secondary"
+                                className="bg-sunglow-500/10 text-sunglow-300 border-sunglow-500/30 text-xs"
+                              >
+                                {subject}
+                              </Badge>
+                            ))}
+                            {profile.subjects.length > 3 && (
+                              <Badge variant="secondary" className="bg-gray1 text-sunglow-200/70 border-gray1 text-xs">
+                                +{profile.subjects.length - 3}
+                              </Badge>
+                            )}
                           </div>
                         )}
                       </div>
-
-                      <h3 className="text-lg font-semibold text-white text-center group-hover:text-blue-400 transition-colors">
-                        {profile.name}
-                      </h3>
                     </CardContent>
                   </Card>
                 ))}

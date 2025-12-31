@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, Loader2, AlertCircle, MapPin, Calendar, Briefcase, Mail } from "lucide-react"
+import { ArrowLeft, Loader2, AlertCircle, MapPin, Calendar, Briefcase, Mail, BookOpen } from "lucide-react"
 import { Card, CardContent } from "./ui/card"
 import { AdCard } from "./AdCard"
 import { getAds } from "../services/adApi"
 
 import type { User, Ad } from "../App"
 import { getProfileById } from "../services/profileServices"
+import { Button } from "./ui/button"
 
 export const UserProfilePage = () => {
   const { userId } = useParams<{ userId: string }>()
@@ -59,10 +60,10 @@ export const UserProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="bg-gray-900 min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 text-teal-500 animate-spin mb-4" />
-          <p className="text-gray-400">Loading profile...</p>
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sunglow-400"></div>
+          <p className="mt-4 text-sunglow-200/70">Loading profile...</p>
         </div>
       </div>
     )
@@ -70,14 +71,22 @@ export const UserProfilePage = () => {
 
   if (error || !profile) {
     return (
-      <div className="bg-gray-900 min-h-screen p-6">
+      <div className="bg-background min-h-screen p-6">
         <div className="max-w-7xl mx-auto">
-          <Card className="bg-red-900/20 border-red-800">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-400" />
-                <p className="text-red-400">{error || "Profile not found"}</p>
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/profiles")}
+            className="mb-4 text-sunglow-200 hover:text-sunglow-300 hover:bg-gray1  "
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to All Profiles
+          </Button>
+          <Card className="bg-sunglow-500/10 border-sunglow-500/30">
+            <CardContent className="pt-6 text-center py-12">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sunglow-500/10 flex items-center justify-center">
+                <AlertCircle className="w-8 h-8 text-sunglow-400" />
               </div>
+              <p className="text-sunglow-300">{error || "Profile not found"}</p>
             </CardContent>
           </Card>
         </div>
@@ -86,27 +95,26 @@ export const UserProfilePage = () => {
   }
 
   return (
-    <div className="bg-gray-900 p-6">
+     <div className="bg-background min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
-        <button
+        <Button
+          variant="ghost"
           onClick={() => navigate("/profiles")}
-          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+          className="mb-6 hover:bg-gray1 text-sunglow-200/70 hover:text-sunglow-300 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 mr-2" />
           Back to All Profiles
-        </button>
+        </Button>
 
-        <Card className="relative bg-gray-800/80 border-gray-700 mb-8 overflow-hidden">
-          {/* Top accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
+        <Card className="relative bg-gray2 border-gray1 gap-0 overflow-hidden mb-8 backdrop-blur-sm">
+          <div className="h-1 bg-gradient-to-r from-sunglow-500 to-sunglow-400" />
 
-          <CardContent className="p-8">
+          <div className="p-6 md:p-8">
             <div className="flex flex-col lg:flex-row items-center gap-8">
-              {/* Left: Avatar section */}
-              <div className="flex flex-col items-center ">
+              <div className="flex flex-col items-center">
                 <div className="relative">
-                  <div className="absolute -inset-1.5 bg-gradient-to-br from-teal-500/40 to-emerald-500/40 rounded-full blur-sm" />
-                  <div className="relative w-36 h-36 rounded-full overflow-hidden ring-2 ring-gray-700">
+                  <div className="absolute -inset-1.5 bg-gradient-to-br from-sunglow-500 to-sunglow-400 opacity-75 rounded-full blur-sm" />
+                  <div className="relative w-36 h-36 rounded-full overflow-hidden ring-2 ring-sunglow-500/50 bg-background">
                     {profile.avatarUrl ? (
                       <img
                         src={
@@ -118,80 +126,98 @@ export const UserProfilePage = () => {
                         alt={profile.name}
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-teal-600 to-emerald-600 flex items-center justify-center">
-                        <span className="text-white text-4xl font-semibold">{getInitials(profile.name)}</span>
+                      <div className="w-full h-full bg-gradient-to-br from-sunglow-600 to-sunglow-500 flex items-center justify-center">
+                        <span className="text-background text-4xl font-semibold">{getInitials(profile.name)}</span>
                       </div>
                     )}
                   </div>
                 </div>
-
-                
               </div>
 
-              {/* Right: User info */}
-              <div className="flex-1 text-center lg:text-left">
-                <h1 className="text-3xl font-bold text-white mb-1">{profile.name}</h1>
 
-                {/* Info badges row */}
+              <div className="flex-1 text-center lg:text-left">
+                <h1 className="text-3xl font-bold text-sunglow-50 mb-1">{profile.name}</h1>
+
                 <div className="flex flex-wrap justify-center lg:justify-start gap-3 mt-3 mb-5">
-                  <div className="flex items-center gap-1.5 text-gray-400 text-sm">
-                    <Mail className="w-4 h-4 text-teal-500" />
+                  <div className="flex items-center gap-1.5 text-sunglow-200/70 text-sm">
+                    <Mail className="w-4 h-4 text-sunglow-400" />
                     <span>{profile.email}</span>
                   </div>
 
                   {profile.city && (
-                    <div className="flex items-center gap-1.5 text-gray-400 text-sm">
-                      <MapPin className="w-4 h-4 text-teal-500" />
+                    <div className="flex items-center gap-1.5 text-sunglow-200/70 text-sm">
+                      <MapPin className="w-4 h-4 text-sunglow-400" />
                       <span>{profile.city}</span>
                     </div>
                   )}
 
                   {profile.experience && (
-                    <div className="flex items-center gap-1.5 text-gray-400 text-sm">
-                      <Briefcase className="w-4 h-4 text-teal-500" />
+                    <div className="flex items-center gap-1.5 text-sunglow-200/70 text-sm">
+                      <Briefcase className="w-4 h-4 text-sunglow-400" />
                       <span>{profile.experience} years experience</span>
                     </div>
                   )}
 
                   {profile.createdAt && (
-                    <div className="flex items-center gap-1.5 text-gray-400 text-sm">
-                      <Calendar className="w-4 h-4 text-teal-500" />
+                    <div className="flex items-center gap-1.5 text-sunglow-200/70 text-sm">
+                      <Calendar className="w-4 h-4 text-sunglow-400" />
                       <span>Member since {formatDate(profile.createdAt)}</span>
                     </div>
                   )}
                 </div>
+                {profile.subjects && profile.subjects.length > 0 && (
+                  <div className="mb-5">
+                    
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-2">
+                      {profile.subjects.map((subject, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 text-sm rounded-full bg-sunglow-500/15 text-sunglow-300 border border-sunglow-500/30"
+                        >
+                          {subject}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                {/* Bio section */}
                 {profile.bio ? (
-                  <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
-                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">About</p>
-                    <p className="text-gray-300 leading-relaxed">{profile.bio}</p>
+                  <div className="rounded-lg p-4 border-transparent border bg-gray1/50">
+                    <p className="text-xs uppercase tracking-wider text-sunglow-200/50 mb-2">About</p>
+                    <p className="text-sunglow-100/80 leading-relaxed">{profile.bio}</p>
                   </div>
                 ) : (
-                  <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
-                    <p className="text-gray-500 italic">This user hasn't added a bio yet.</p>
+                  <div className="bg-gray1 rounded-lg p-4 border border-sunglow-500/20">
+                    <p className="text-sunglow-200/50 italic">This user hasn't added a bio yet.</p>
                   </div>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-1">
-              Ads
-              <span className="ml-2 text-lg text-teal-500">({ads.length})</span>
-            </h2>
-            <p className="text-gray-400 text-sm">All active ads from this user</p>
           </div>
-        </div>
+        </Card>
+        {ads.length > 0 && (
+          <div className="flex items-center gap-3 mb-6 max-w-6xl mx-auto">
+                  <div className="p-2 rounded-xl bg-sunglow-500/15 border border-sunglow-500/30">
+                    <BookOpen className="w-5 h-5 text-sunglow-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-sunglow-50">
+                      Found <span className="text-sunglow-400">({ads.length})</span> {ads.length === 1 ? "ad" : "ads"}  
+                    </h2>
+                    <p className="text-sunglow-200/60 text-sm">All active ads from this user</p>
+                  </div>
+                </div>
+        )}
+         
 
         {ads.length === 0 ? (
-          <Card className="bg-gray-800/80 border-gray-700">
+          <Card className="bg-gray2 border-gray1">
             <CardContent className="py-16">
               <div className="text-center">
-                <p className="text-gray-400 text-lg">This user currently has no active ads</p>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sunglow-500/10 flex items-center justify-center">
+                  <BookOpen className="w-8 h-8 text-sunglow-400" />
+                </div>
+                <p className="text-sunglow-200/70 text-lg">This user currently has no active ads</p>
               </div>
             </CardContent>
           </Card>

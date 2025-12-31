@@ -145,7 +145,7 @@ export function BrowseAds() {
     (cityFilter ? 1 : 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sunglow-500/60 via-background to-background">
+    <div className="min-h-screen bg-background">
       <div className="px-6 py-8">
         <div className="text-center mb-10 pt-6">
           <h1 className="text-4xl font-bold mb-3 text-sunglow-50">Browse Ads</h1>
@@ -378,12 +378,20 @@ export function BrowseAds() {
             
             {
               ads.length!==0 &&(
-                <div className="mb-4 text-white font-bold max-w-6xl mx-auto">
-                Found {ads.length} {ads.length === 1 ? "ad" : "ads"}
-                {isSearching && ` for "${searchQuery}"`}
-              </div>
+                <div className="flex items-center gap-3 mb-6 max-w-6xl mx-auto">
+                  <div className="p-2 rounded-xl bg-sunglow-500/15 border border-sunglow-500/30">
+                    <BookOpen className="w-5 h-5 text-sunglow-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-sunglow-50">
+                      Found <span className="text-sunglow-400">({ads.length})</span> {ads.length === 1 ? "ad" : "ads"}  {isSearching && ` for "${searchQuery}"`}
+                    </h2>
+                    <p className="text-sunglow-200/60 text-sm">All active ads</p>
+                  </div>
+                </div>
               )
             }
+            
             
 
             {ads.length === 0 && (
