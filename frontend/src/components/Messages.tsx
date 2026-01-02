@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
-import { Search, Send, Paperclip, MoreVertical, MessageCircle } from "lucide-react";
+import {
+  Search,
+  Send,
+  Paperclip,
+  MoreVertical,
+  MessageCircle,
+} from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -62,8 +68,11 @@ interface ConversationVM {
 
 export function Messages() {
   const { currentUser } = useAuth();
-  const { socket, connected, refreshUnreadCounts: refreshGlobalUnreadCounts } =
-    useSocket();
+  const {
+    socket,
+    connected,
+    refreshUnreadCounts: refreshGlobalUnreadCounts,
+  } = useSocket();
 
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -124,7 +133,6 @@ export function Messages() {
       setOnlineUserIds(new Set(userIds));
     });
   };
-
 
   useEffect(() => {
     const stateConversation = (location.state as any)?.conversation as
@@ -554,22 +562,21 @@ export function Messages() {
 
   return (
     <div className="h-full flex bg-background">
-
-      <div className="w-80 border-r border-gray1 flex flex-col bg-gray2">
-        <div className="p-4 border-b border-gray1">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
+      <div className="w-20 sm:w-70 border-r border-gray1 flex flex-col bg-gray2">
+        <div className="p-3 sm:p-4 border-b border-gray1">
+          <div className="flex items-center sm:justify-between justify-center mb-0 sm:mb-4">
+            <div className="flex items-center gap-0 sm:gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sunglow-500 to-sunglow-600 flex items-center justify-center shadow-lg shadow-sunglow-500/20">
                 <MessageCircle className="w-5 h-5 text-sunglow-950" />
               </div>
-              <h2 className="text-xl font-semibold text-sunglow-50">Messages</h2>
+              <h2 className="hidden sm:block text-xl font-semibold text-sunglow-50">
+                {currentUser?.name ?? "Messages"}
+              </h2>
             </div>
-            {totalUnread > 0 && (
-              <Badge className="bg-sunglow-500 text-sunglow-950 hover:bg-sunglow-400">{totalUnread}</Badge>
-            )}
+            
           </div>
 
-          <div className="relative">
+          <div className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sunglow-400" />
             <Input
               placeholder="Search conversations..."
@@ -591,16 +598,16 @@ export function Messages() {
               <button
                 key={conversation.id}
                 onClick={() => {
-                  setSelectedConversationId(conversation.id)
-                  setSearchParams({ conversationId: conversation.id })
+                  setSelectedConversationId(conversation.id);
+                  setSearchParams({ conversationId: conversation.id });
                 }}
-                className={`w-full p-4 flex items-start gap-3 border-b border-gray1 transition-all duration-200 ${
+                className={`w-full p-2 sm:p-4 flex items-start sm:items-start gap-0 sm:gap-3 border-b border-gray1 transition-all duration-200 ${
                   selectedConversationId === conversation.id
                     ? "bg-sunglow-500/10 border-l-2 border-l-sunglow-500"
                     : "hover:bg-gray1/50"
                 }`}
               >
-                <div className="relative flex-shrink-0">
+                <div className="relative flex-shrink-0 w-full sm:w-auto flex justify-center sm:block">
                   <Avatar className="w-12 h-12 ring-2 ring-gray1">
                     <AvatarImage
                       src={
@@ -616,16 +623,29 @@ export function Messages() {
                   {conversation.online && (
                     <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-gray2 rounded-full" />
                   )}
+                  {conversation.unreadCount > 0 && (
+                    <Badge className="sm:hidden absolute -top-1 -right-1 bg-sunglow-500 text-sunglow-950 text-[10px] px-1.5 py-0">
+                      {conversation.unreadCount > 99
+                        ? "99+"
+                        : conversation.unreadCount}
+                    </Badge>
+                  )}
                 </div>
 
-                <div className="flex-1 min-w-0 text-left">
+                <div className="hidden sm:block flex-1 min-w-0 text-left">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium truncate text-sunglow-50">{conversation.participantName}</span>
-                    <span className="text-xs text-sunglow-200/50 ml-2">{conversation.lastMessageTime}</span>
+                    <span className="font-medium truncate text-sunglow-50">
+                      {conversation.participantName}
+                    </span>
+                    <span className="text-xs text-sunglow-200/50 ml-2">
+                      {conversation.lastMessageTime}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-sunglow-200/60 truncate">{conversation.lastMessage}</p>
+                    <p className="text-sm text-sunglow-200/60 truncate">
+                      {conversation.lastMessage}
+                    </p>
                     {conversation.unreadCount > 0 && (
                       <Badge className="ml-2 bg-sunglow-500 text-sunglow-950 text-xs px-2 py-0.5">
                         {conversation.unreadCount}
@@ -639,7 +659,6 @@ export function Messages() {
         </div>
       </div>
 
-
       {selectedConversationId && selectedOther ? (
         <div className="flex-1 flex flex-col bg-background">
           <div className="p-4 border-b border-gray1 bg-gray2 flex items-center justify-between">
@@ -647,7 +666,11 @@ export function Messages() {
               <div className="relative">
                 <Avatar className="w-11 h-11 ring-2 ring-sunglow-500/30">
                   <AvatarImage
-                    src={selectedOther.avatarUrl ? `http://localhost:4000${selectedOther.avatarUrl}` : undefined}
+                    src={
+                      selectedOther.avatarUrl
+                        ? `http://localhost:4000${selectedOther.avatarUrl}`
+                        : undefined
+                    }
                   />
                   <AvatarFallback className="bg-gradient-to-br from-sunglow-500 to-sunglow-600 text-sunglow-950 font-semibold">
                     {selectedOther.name.charAt(0).toUpperCase()}
@@ -658,26 +681,46 @@ export function Messages() {
                 )}
               </div>
               <div>
-                <div className="font-medium text-sunglow-50">{selectedOther.name}</div>
+                <div className="font-medium text-sunglow-50">
+                  {selectedOther.name}
+                </div>
                 <div className="text-sm text-sunglow-200/60">
-                  {onlineUserIds.has(selectedOther.id) ? <span className="text-green-400">Online</span> : "Offline"}
-                  {selectedOtherTyping && <span className="text-sunglow-400 ml-1">• typing...</span>}
+                  {onlineUserIds.has(selectedOther.id) ? (
+                    <span className="text-green-400">Online</span>
+                  ) : (
+                    "Offline"
+                  )}
+                  {selectedOtherTyping && (
+                    <span className="text-sunglow-400 ml-1">• typing...</span>
+                  )}
                 </div>
               </div>
             </div>
 
-            <Button variant="ghost" size="icon" className="text-sunglow-200/60 hover:text-sunglow-50 hover:bg-gray1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-sunglow-200/60 hover:text-sunglow-50 hover:bg-gray1"
+            >
               <MoreVertical className="w-5 h-5" />
             </Button>
           </div>
 
-          <div ref={messagesContainerRef} className="flex-1 overflow-auto p-6 space-y-4 bg-background">
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 overflow-auto p-6 space-y-4 bg-background"
+          >
             {messages.map((m) => {
-              const isCurrentUser = currentUser?.id === m.senderId
-              const isEditing = editingMessageId === m.id
-              const canModify = isCurrentUser && !m.isDeleted
+              const isCurrentUser = currentUser?.id === m.senderId;
+              const isEditing = editingMessageId === m.id;
+              const canModify = isCurrentUser && !m.isDeleted;
               return (
-                <div key={m.id} className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}>
+                <div
+                  key={m.id}
+                  className={`flex ${
+                    isCurrentUser ? "justify-end" : "justify-start"
+                  }`}
+                >
                   <div className="max-w-[70%]">
                     <div
                       className={`rounded-2xl px-4 py-1.5 ${
@@ -689,12 +732,16 @@ export function Messages() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           {m.isDeleted ? (
-                            <p className="italic text-sm opacity-70">Message deleted</p>
+                            <p className="italic text-sm opacity-70">
+                              Message deleted
+                            </p>
                           ) : isEditing ? (
                             <div className="space-y-2">
                               <Input
                                 value={editingValue}
-                                onChange={(e) => setEditingValue(e.target.value)}
+                                onChange={(e) =>
+                                  setEditingValue(e.target.value)
+                                }
                                 className="bg-gray1 border-gray1 text-sunglow-50"
                               />
                               <div className="flex gap-2 justify-end">
@@ -720,7 +767,9 @@ export function Messages() {
                               </div>
                             </div>
                           ) : (
-                            <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                            <p className="whitespace-pre-wrap break-words">
+                              {m.content}
+                            </p>
                           )}
                         </div>
 
@@ -741,7 +790,10 @@ export function Messages() {
                                 <MoreVertical className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-gray2 border-gray1">
+                            <DropdownMenuContent
+                              align="end"
+                              className="bg-gray2 border-gray1"
+                            >
                               <DropdownMenuItem
                                 onClick={() => startEditing(m)}
                                 className="text-sunglow-50 focus:bg-gray1 focus:text-sunglow-50"
@@ -753,38 +805,51 @@ export function Messages() {
                                 disabled={deletingMessageId === m.id}
                                 className="text-red-400 focus:bg-gray1 focus:text-red-400"
                               >
-                                {deletingMessageId === m.id ? "Deleting..." : "Delete"}
+                                {deletingMessageId === m.id
+                                  ? "Deleting..."
+                                  : "Delete"}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         )}
                       </div>
 
-                      <div className={`text-xs mt-1 flex justify-end ${isCurrentUser ? "text-sunglow-800" : "text-sunglow-200/50"}`}>
+                      <div
+                        className={`text-xs mt-1 flex justify-end ${
+                          isCurrentUser
+                            ? "text-sunglow-800"
+                            : "text-sunglow-200/50"
+                        }`}
+                      >
                         {new Date(
                           m.isDeleted && m.deletedAt
                             ? m.deletedAt
                             : !m.isDeleted && m.isEdited && m.editedAt
-                              ? m.editedAt
-                              : m.createdAt,
+                            ? m.editedAt
+                            : m.createdAt
                         ).toLocaleTimeString("en-GB", {
                           hour: "2-digit",
                           minute: "2-digit",
                           hour12: false,
                         })}
                         {m.isDeleted && m.deletedAt ? " • deleted" : ""}
-                        {!m.isDeleted && m.isEdited && m.editedAt ? " • edited" : ""}
+                        {!m.isDeleted && m.isEdited && m.editedAt
+                          ? " • edited"
+                          : ""}
                       </div>
                     </div>
                   </div>
                 </div>
-              )
+              );
             })}
             <div ref={messagesEndRef} />
           </div>
 
           <div className="p-4 border-t border-gray1 bg-gray2">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-3">
+            <form
+              onSubmit={handleSendMessage}
+              className="flex items-center gap-3"
+            >
               <Button
                 type="button"
                 variant="ghost"
@@ -815,10 +880,12 @@ export function Messages() {
             <div className="w-20 h-20 rounded-2xl bg-gray2 border border-gray1 flex items-center justify-center mx-auto mb-4">
               <MessageCircle className="w-10 h-10 text-sunglow-500/50" />
             </div>
-            <p className="text-sunglow-200/60 text-lg">Select a conversation to start messaging</p>
+            <p className="text-sunglow-200/60 text-lg">
+              Select a conversation to start messaging
+            </p>
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

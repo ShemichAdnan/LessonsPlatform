@@ -173,7 +173,7 @@ export const AllProfilesPage = () => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
                 {filteredProfiles.map((profile) => (
                   <Card
                     key={profile.id}
@@ -182,7 +182,7 @@ export const AllProfilesPage = () => {
                   >
                     <CardContent className="p-0 flex flex-col">
                       
-                      <div className="relative h-42 w-full overflow-hidden ">
+                      <div className="relative h-48 w-full overflow-hidden ">
                         {profile.avatarUrl ? (
                           <img
                             src={
