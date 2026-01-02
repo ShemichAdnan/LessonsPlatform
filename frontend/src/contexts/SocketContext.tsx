@@ -1,54 +1,91 @@
-import React,{createContext,useContext,useEffect, useState} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 import { useAuth } from "./AuthContext";
 
 type SocketContextType = {
   socket: Socket | null;
   connected: boolean;
+  totalUnread: number;
+  refreshUnreadCounts: () => void;
 };
 
-const SocketContext = createContext<SocketContextType>({ socket: null, connected: false });
+const SocketContext = createContext<SocketContextType>({
+  socket: null,
+  connected: false,
+  totalUnread: 0,
+  refreshUnreadCounts: () => {},
+});
 
 export const useSocket = () => useContext(SocketContext);
 
-export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { currentUser } = useAuth();
-    const [socket, setSocket] = useState<Socket | null>(null);
-    const [connected, setConnected] = useState<boolean>(false);
+export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { currentUser } = useAuth();
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [connected, setConnected] = useState<boolean>(false);
+  const [totalUnread, setTotalUnread] = useState<number>(0);
 
-    useEffect(() => {
-        if(!currentUser){
-            if(socket){
-                socket.disconnect();    
-                setSocket(null);
-            }
-            setConnected(false);
-            return;
-        }
+  const refreshUnreadCounts = () => {
+    if (!socket) return;
+    socket.emit("getUnreadCount", null, (resp: any) => {
+      if (!resp?.success) return;
+      setTotalUnread(resp.totalUnread ?? 0);
+    });
+  };
 
-        const socketInstance = io("http://localhost:4000", {
-            withCredentials: true,
-            transports: ['websocket'],
-        });
+  useEffect(() => {
+    if (!currentUser) {
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+      }
+      setConnected(false);
+      setTotalUnread(0);
+      return;
+    }
 
-        setSocket(socketInstance);
+    const socketInstance = io("http://localhost:4000", {
+      withCredentials: true,
+      transports: ["websocket"],
+    });
 
-        const onConnect = () => setConnected(true);
-        const onDisconnect = () => setConnected(false);
+    setSocket(socketInstance);
 
-        socketInstance.on("connect", onConnect);
-        socketInstance.on("disconnect", onDisconnect);
+    const onConnect = () => {
+      setConnected(true);
+      socketInstance.emit("getUnreadCount", null, (resp: any) => {
+        if (!resp?.success) return;
+        setTotalUnread(resp.totalUnread ?? 0);
+      });
+    };
+    const onDisconnect = () => setConnected(false);
 
-        return () => {
-            socketInstance.off("connect", onConnect);
-            socketInstance.off("disconnect", onDisconnect);
-            socketInstance.disconnect();
-        };
-    }, [currentUser?.id]);
+    const onNotification = (payload: any) => {
+      if (payload?.type !== "new_message") return;
+      socketInstance.emit("getUnreadCount", null, (resp: any) => {
+        if (!resp?.success) return;
+        setTotalUnread(resp.totalUnread ?? 0);
+      });
+    };
 
-    return (
-        <SocketContext.Provider value={{ socket,connected}}>
-            {children}
-        </SocketContext.Provider>
-    );
+    socketInstance.on("connect", onConnect);
+    socketInstance.on("disconnect", onDisconnect);
+    socketInstance.on("notification", onNotification);
+
+    return () => {
+      socketInstance.off("connect", onConnect);
+      socketInstance.off("disconnect", onDisconnect);
+      socketInstance.off("notification", onNotification);
+      socketInstance.disconnect();
+    };
+  }, [currentUser?.id]);
+
+  return (
+    <SocketContext.Provider
+      value={{ socket, connected, totalUnread, refreshUnreadCounts }}
+    >
+      {children}
+    </SocketContext.Provider>
+  );
 };

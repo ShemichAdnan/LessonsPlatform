@@ -62,9 +62,16 @@ io.on('connection', (socket) => {
             socket.to(result.conversationId).emit("newMessage", result.message);
         
             if(callback) callback({ success: true, message: result.message });
-        
-            if(recipientId && onlineUsers.has(recipientId)){
-                io.to(onlineUsers.get(recipientId)!).emit("notification", {
+
+  
+            const recipients = recipientId
+                ? [recipientId]
+                : await messageService.getRecipientUserIdsForConversation(result.conversationId, senderId);
+
+            for (const rid of recipients) {
+                const socketId = onlineUsers.get(rid);
+                if (!socketId) continue;
+                io.to(socketId).emit("notification", {
                     type: 'new_message',
                     conversationId: result.conversationId,
                     message: result.message,

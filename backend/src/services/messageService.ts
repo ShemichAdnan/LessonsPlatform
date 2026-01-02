@@ -82,3 +82,9 @@ export async function getUnreadCountsList(userId: string) {
     ]);
     return { perConversation, totalUnread };
 }
+
+export async function getRecipientUserIdsForConversation(conversationId: string, senderId: string) {
+    const conversation = await conversationModel.getConversationById(conversationId, senderId);
+    const ids = conversation.participants.map(p => p.userId).filter(id => id !== senderId);
+    return Array.from(new Set(ids));
+}
