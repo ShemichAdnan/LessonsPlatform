@@ -8,8 +8,6 @@ import { AllProfilesPage } from "./components/AllProfilesPage";
 import { UserProfilePage } from "./components/UserProfilePage";
 import { AdPage } from "./components/AdPage";
 import { Messages } from "./components/Messages";
-import { AIAssistant } from "./components/AIAssistant";
-import { Communities } from "./components/Communities";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { SocketProvider } from "./contexts/SocketContext";
 
@@ -86,8 +84,6 @@ function AppContent() {
         <Route path="profiles/:userId" element={<UserProfilePage />} />
         <Route path="ads/:adId" element={<AdPage />} />
         <Route path="messages" element={<Messages />} />
-        <Route path="ai" element={<AIAssistant />} />
-        <Route path="communities" element={<Communities />} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

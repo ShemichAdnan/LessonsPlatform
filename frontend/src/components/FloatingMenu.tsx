@@ -21,8 +21,6 @@ const menuItems = [
   { path: "/browse", label: "Browse Ads", icon: Search },
   { path: "/profiles", label: "All Profiles", icon: Users },
   { path: "/messages", label: "Messages", icon: MessageSquare },
-  { path: "/ai", label: "AI Assistant", icon: Sparkles },
-  { path: "/communities", label: "Communities", icon: Users },
   { path: "/profile", label: "My Profile", icon: User },
 ];
 
