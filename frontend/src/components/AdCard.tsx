@@ -237,7 +237,7 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
               variant="outline"
               size="sm"
             >
-              Contact
+              View details
             </Button>
           ) : null}
         </CardFooter>
@@ -258,7 +258,7 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
           onClick={handleCancelPassword}
         >
           <Card
-            className="border-gray1 bg-background w-full max-w-md"
+            className="border-gray1 bg-background w-full max-w-md pb-6"
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader>

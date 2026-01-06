@@ -42,7 +42,6 @@ export function FloatingCreateAd({
   const [location, setLocation] = useState("");
   const [city, setCity] = useState("");
   const [description, setDescription] = useState("");
-  const [currentTime, setCurrentTime] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

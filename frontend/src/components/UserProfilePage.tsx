@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
-  Loader2,
   AlertCircle,
   MapPin,
   Calendar,
@@ -18,14 +17,18 @@ import type { User, Ad } from "../App";
 import { getProfileById } from "../services/profileServices";
 import { Button } from "./ui/button";
 import defaultAvatar from "../assets/images/defaultAvatar.png";
+import { useAuth } from "../contexts/AuthContext";
+import { startConversation } from "../services/messageServices";
 
 export const UserProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
+  const { currentUser: user } = useAuth();
   const [profile, setProfile] = useState<User | null>(null);
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [startingChat, setStartingChat] = useState(false);
 
   const fetchData = async () => {
     if (!userId) return;
@@ -196,6 +199,39 @@ export const UserProfilePage = () => {
                     <p className="text-sunglow-200/50 italic">
                       This user hasn't added a bio yet.
                     </p>
+                  </div>
+                )}
+
+                {user && user.id !== profile.id && (
+                  <div className="mt-5 flex justify-center lg:justify-start">
+                    <Button
+                      disabled={startingChat}
+                      onClick={async () => {
+                        try {
+                          setStartingChat(true);
+                          const conversation = await startConversation(
+                            profile.id
+                          );
+                          navigate(
+                            `/messages?conversationId=${conversation.id}`,
+                            {
+                              state: {
+                                conversation,
+                                conversationId: conversation.id,
+                              },
+                            }
+                          );
+                        } catch (err) {
+                          console.error("Failed to start conversation", err);
+                        } finally {
+                          setStartingChat(false);
+                        }
+                      }}
+                      className="bg-gradient-to-r from-sunglow-500 to-sunglow-400 text-background hover:from-sunglow-400 hover:to-sunglow-300 shadow-lg shadow-sunglow-500/20"
+                    >
+                      <Mail className="w-4 h-4" />
+                      {startingChat ? "Opening..." : "Contact"}
+                    </Button>
                   </div>
                 )}
               </div>

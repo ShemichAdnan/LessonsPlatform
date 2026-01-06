@@ -101,7 +101,7 @@ export function AuthPage({ onLogin }: AuthPageProps) {
           </div>
         </div>
 
-        <Card className="shadow-xl bg-gray2/30 border-gray-700/50 backdrop-blur-md">
+        <Card className="shadow-xl bg-gray2/30 border-gray-700/50 backdrop-blur-md pb-6">
           <CardHeader>
             <CardTitle className="text-sunglow-50">
               {authMode === "login" ? "Welcome Back" : "Get Started"}

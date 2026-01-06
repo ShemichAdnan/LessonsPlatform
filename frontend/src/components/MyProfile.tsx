@@ -32,7 +32,6 @@ export function MyProfile() {
     pricePerHour,
     setPricePerHour,
     subjects,
-    setSubjects,
     currentSubject,
     setCurrentSubject,
     currentPassword,
@@ -40,7 +39,6 @@ export function MyProfile() {
     showPasswordPrompt,
     saving,
     error,
-    selectedAvatarFile,
     avatarPreview,
     showChangePasswordModal,
     changePasswordData,
@@ -48,7 +46,6 @@ export function MyProfile() {
     changingPassword,
     passwordError,
     myAds,
-    setMyAds,
 
     dirty,
     avatarDirty,
