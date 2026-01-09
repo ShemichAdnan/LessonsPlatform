@@ -120,13 +120,7 @@ export const UserProfilePage = () => {
                   <div className="absolute -inset-1.5 bg-gradient-to-br from-sunglow-500 to-sunglow-400 opacity-75 rounded-full blur-sm" />
                   <div className="relative w-36 h-36 rounded-full overflow-hidden ring-2 ring-sunglow-500/50 bg-background">
                     <img
-                      src={
-                        profile.avatarUrl
-                          ? profile.avatarUrl.startsWith("http")
-                            ? profile.avatarUrl
-                            : `http://localhost:4000${profile.avatarUrl}`
-                          : defaultAvatar
-                      }
+                      src={profile.avatarUrl || defaultAvatar}
                       className="w-full h-full object-cover"
                       alt={profile.name}
                       onError={(e) => {
@@ -156,7 +150,7 @@ export const UserProfilePage = () => {
                     </div>
                   )}
 
-                  {profile.experience!==null && (
+                  {profile.experience !== null && (
                     <div className="flex items-center gap-1.5 text-sunglow-200/70 text-sm">
                       <Briefcase className="w-4 h-4 text-sunglow-400" />
                       <span>{profile.experience} years experience</span>

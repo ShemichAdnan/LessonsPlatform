@@ -1,6 +1,7 @@
 import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
 import type { Response, Request, NextFunction } from 'express';
 import { prisma } from '../utils/prisma.js';
+import { withAvatarUrl } from '../utils/avatar.js';
 
 const sign = (payload: string | object | Buffer, secret: Secret, expiresIn: string | number) =>
   jwt.sign(payload, secret, { expiresIn } as SignOptions);
@@ -56,7 +57,7 @@ export async function authGuard(req: Request, res: Response, next: NextFunction)
     
     const user = await prisma.user.findUnique({ 
       where: { id: payload.sub }, 
-      select: { id: true, email: true, name: true, avatarUrl: true, bio: true, city: true, experience: true, pricePerHour: true, subjects: true }
+      select: { id: true, email: true, name: true, avatarMime: true, bio: true, city: true, experience: true, pricePerHour: true, subjects: true }
     });
     
     if (!user) {
@@ -64,7 +65,7 @@ export async function authGuard(req: Request, res: Response, next: NextFunction)
       return;
     }
     
-    (req as any).user = user;
+    (req as any).user = withAvatarUrl(user as any);
     next();
   } catch (e) {
     res.status(401).json({ message: 'Unauthenticated' });

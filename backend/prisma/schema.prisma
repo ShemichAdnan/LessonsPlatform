@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  engineType = "binary"
 }
 
 datasource db {
@@ -12,7 +13,8 @@ model User {
   email         String   @unique
   passwordHash  String
   name          String
-  avatarUrl     String?
+  avatarData    Bytes?   @db.LongBlob
+  avatarMime    String?  @db.VarChar(100)
   subjects      Json?    
   bio           String?  @db.Text
   city          String?

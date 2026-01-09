@@ -93,7 +93,7 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
       <Card
         key={ad.id}
         onClick={() => navigate(`/ads/${ad.id}`)}
-        className="group relative overflow-hidden bg-gray2 border-gray1/50 hover:border-sunglow-400/40 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-sunglow-400/10 hover:-translate-y-1 rounded-xl"
+        className="group relative overflow-hidden bg-gray2 border-gray1/50 hover:border-sunglow-400/40 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-sunglow-400/10 hover:-translate-y-1 rounded-xl flex flex-col h-full"
       >
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between mb-4">
@@ -134,7 +134,7 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
           </p>
         </CardHeader>
 
-        <CardContent className="space-y-3 pt-2">
+        <CardContent className="pt-2 flex-1 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             <BookOpen className="w-4 h-4 text-sunglow-400" />
             {ad.areas.slice(0, 2).map((area, index) => (
@@ -162,16 +162,10 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
             </span>
           </div>
 
-          <div className="flex items-center gap-3 pt-3 border-t border-gray1/50">
+          <div className="mt-auto flex items-center gap-3 pt-3 border-t border-gray1/50">
             <Avatar className="size-10 ring-2 ring-sunglow-400/30">
               <AvatarImage
-                src={
-                  ad.user.avatarUrl
-                    ? ad.user.avatarUrl.startsWith("http")
-                      ? ad.user.avatarUrl
-                      : `http://localhost:4000${ad.user.avatarUrl}`
-                    : defaultAvatar
-                }
+                src={ad.user.avatarUrl || defaultAvatar}
                 alt={ad.user.name}
                 className="object-cover"
                 onError={(e) => {
@@ -184,8 +178,7 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
               <span className="font-medium text-sunglow-50 truncate block">
                 {ad.user.name}
               </span>
-              {
-                ad.user.experience != null &&
+              {ad.user.experience != null &&
                 Number(ad.user.experience) !== 0 && (
                   <span className="text-xs text-gray-500 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
@@ -221,10 +214,10 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
           </div>
         </CardContent>
 
-        <CardFooter className="pt-0">
+        <CardFooter className="pt-0 mt-auto">
           {user && user.id !== ad.userId ? (
             <Button
-              className="w-full bg-sunglow-400/10 text-sunglow-300 border border-sunglow-400/30 hover:bg-sunglow-400/20 cursor-pointer"
+              className="w-full bg-sunglow-400/10 text-sunglow-300 border border-sunglow-400/30 hover:bg-sunglow-400/20 cursor-pointer "
               variant="outline"
               size="sm"
             >

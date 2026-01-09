@@ -123,14 +123,7 @@ export function MyProfile() {
                   <Avatar className="relative w-24 h-24 ring-2 ring-sunglow-500/30">
                     <AvatarImage
                       className="object-cover"
-                      src={
-                        avatarPreview ||
-                        (user.avatarUrl
-                          ? user.avatarUrl.startsWith("http")
-                            ? user.avatarUrl
-                            : `http://localhost:4000${user.avatarUrl}`
-                          : defaultAvatar)
-                      }
+                      src={avatarPreview || user.avatarUrl || defaultAvatar}
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = defaultAvatar;

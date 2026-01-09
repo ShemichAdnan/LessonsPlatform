@@ -1,11 +1,5 @@
 import bcrypt from 'bcryptjs';
 import { userModel } from '../models/userModel.js';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export const authService = {
   async register(data: { email: string; name: string; password: string }) {
@@ -65,19 +59,12 @@ export const authService = {
   },
 
   async uploadAvatar(userId: string, file: Express.Multer.File) {
-    const currentUser = await userModel.findById(userId);
-    
-    if (currentUser?.avatarUrl) {
-      const oldFilePath = path.join(__dirname, '../../uploads/avatars', path.basename(currentUser.avatarUrl));
-      try {
-        await fs.unlink(oldFilePath);
-      } catch (err) {
-        console.error('Could not delete old avatar:', err);
-      }
+    if (!file.buffer || file.buffer.length === 0) {
+      throw new Error('Empty file');
     }
 
-    const avatarUrl = `/uploads/avatars/${file.filename}`;
-    return userModel.updateAvatar(userId, avatarUrl);
+    const mime = file.mimetype || 'application/octet-stream';
+    return userModel.updateAvatarData(userId, file.buffer, mime);
   },
 
   async changePassword(userId: string, currentPassword: string, newPassword: string) {

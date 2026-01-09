@@ -1,4 +1,5 @@
 import {prisma} from '../utils/prisma.js';
+import { withAvatarUrl } from '../utils/avatar.js';
 
 export interface CreateAdData{
     userId: string;
@@ -13,7 +14,7 @@ export interface CreateAdData{
 }
 
 export const createAd = async(data: CreateAdData) => {
-    return prisma.ad.create({
+    const ad = await prisma.ad.create({
         data: {
             userId: data.userId,
             type: data.type,
@@ -31,13 +32,18 @@ export const createAd = async(data: CreateAdData) => {
                     id: true,
                     name: true,
                     email: true,
-                    avatarUrl: true,
+                    avatarMime: true,
                     city: true,
                     experience: true,
                 },
             },
         },
     });
+
+    return {
+        ...ad,
+        user: withAvatarUrl(ad.user as any),
+    };
 };
 
 export const findAds = async(filters?: {
@@ -76,7 +82,7 @@ export const findAds = async(filters?: {
                     id: true,
                     name: true,
                     email: true,
-                    avatarUrl: true,
+                    avatarMime: true,
                     city: true,
                     experience: true,
                 },
@@ -87,7 +93,10 @@ export const findAds = async(filters?: {
         },
     });
 
-    let filteredAds=allAds;
+    let filteredAds=allAds.map(ad => ({
+        ...ad,
+        user: withAvatarUrl(ad.user as any),
+    }));
 
     if(filters?.subject) {
         const subjectLower=filters.subject.toLowerCase();
@@ -102,7 +111,7 @@ export const findAds = async(filters?: {
 };
 
 export const findAdById = async(id: string) => {
-    return prisma.ad.findUnique({
+    const ad = await prisma.ad.findUnique({
         where: { id },
         include: {
             user: {
@@ -110,7 +119,7 @@ export const findAdById = async(id: string) => {
                     id: true,
                     name: true,
                     email: true,
-                    avatarUrl: true,
+                    avatarMime: true,
                     city: true,
                     experience: true,
                     bio: true,
@@ -118,10 +127,16 @@ export const findAdById = async(id: string) => {
             },
         },
     });
+
+    if (!ad) return null;
+    return {
+        ...ad,
+        user: withAvatarUrl(ad.user as any),
+    };
 }
 
 export const findAdsByUserId=async(userId: string) => {
-    return prisma.ad.findMany({
+    const ads = await prisma.ad.findMany({
         where: { userId },
         include: {
             user: {
@@ -129,7 +144,7 @@ export const findAdsByUserId=async(userId: string) => {
                     id: true,
                     name: true,
                     email: true,
-                    avatarUrl: true,
+                    avatarMime: true,
                     bio: true,
                     subjects: true,
                     experience: true,
@@ -142,10 +157,15 @@ export const findAdsByUserId=async(userId: string) => {
             createdAt: 'desc',
         },
     });
+
+    return ads.map(ad => ({
+        ...ad,
+        user: withAvatarUrl(ad.user as any),
+    }));
 }
 
 export const updateAd=async(id:string,data:Partial<CreateAdData>)=>{
-    return prisma.ad.update({
+    const ad = await prisma.ad.update({
         where: { id },
         data,
         include: {
@@ -154,11 +174,16 @@ export const updateAd=async(id:string,data:Partial<CreateAdData>)=>{
                     id: true,
                     name: true,
                     email: true,
-                    avatarUrl: true,
+                    avatarMime: true,
                 },
             },
         },
     });
+
+    return {
+        ...ad,
+        user: withAvatarUrl(ad.user as any),
+    };
 }
 
 export const deleteAd=async(id:string)=>{
@@ -177,7 +202,7 @@ export const searchAds=async(query:string)=>{
                     id: true,
                     name: true,
                     email: true,
-                    avatarUrl: true,
+                    avatarMime: true,
                     city: true,
                     experience: true,
                 }
@@ -187,7 +212,13 @@ export const searchAds=async(query:string)=>{
             createdAt: 'desc',
         },
     }); 
-    const filteredAds=allAds.filter(ad=>{
+
+    const normalizedAds = allAds.map(ad => ({
+        ...ad,
+        user: withAvatarUrl(ad.user as any),
+    }));
+
+    const filteredAds=normalizedAds.filter(ad=>{
         if(ad.subject.toLowerCase().includes(lowerQuery)) return true;
         if(ad.location.toLowerCase().includes(lowerQuery)) return true;
         if(ad.city && ad.city.toLowerCase().includes(lowerQuery)) return true;

@@ -1,4 +1,22 @@
 import {prisma} from '../utils/prisma.js';
+import { withAvatarUrl } from '../utils/avatar.js';
+
+function normalizeConversation(conversation: any) {
+    if (!conversation) return conversation;
+    return {
+        ...conversation,
+        participants: conversation.participants?.map((p: any) => ({
+            ...p,
+            user: p.user ? withAvatarUrl(p.user) : p.user,
+        })),
+        messages: conversation.messages
+            ? conversation.messages.map((m: any) => ({
+                ...m,
+                sender: m.sender ? withAvatarUrl(m.sender) : m.sender,
+            }))
+            : conversation.messages,
+    };
+}
 
 export async function findOrCreateConversation(userId1: string, userId2: string) {
     let participantIds = [userId1, userId2].sort();     
@@ -16,7 +34,7 @@ export async function findOrCreateConversation(userId1: string, userId2: string)
                         select: {
                             id: true,
                             name: true,
-                            avatarUrl: true,
+                            avatarMime: true,
                         }
                     }
                 }
@@ -31,7 +49,7 @@ export async function findOrCreateConversation(userId1: string, userId2: string)
                         select: {
                             id: true,
                             name: true,
-                            avatarUrl: true,
+                            avatarMime: true,
                         }
                     }
                 }   
@@ -56,7 +74,7 @@ export async function findOrCreateConversation(userId1: string, userId2: string)
                             select: {
                                 id: true,
                                 name: true,
-                                avatarUrl: true,
+                                avatarMime: true,
                             }
                         }
                     }
@@ -67,7 +85,7 @@ export async function findOrCreateConversation(userId1: string, userId2: string)
                             select: {
                                 id: true,
                                 name: true,
-                                avatarUrl: true,
+                                avatarMime: true,
                             }
                         }
                     }
@@ -75,7 +93,7 @@ export async function findOrCreateConversation(userId1: string, userId2: string)
             }
         })
     }
-    return conversation;
+    return normalizeConversation(conversation);
 }
 
 export async function getUserConversations(userId: string) {
@@ -90,7 +108,7 @@ export async function getUserConversations(userId: string) {
                         select: {
                             id: true,
                             name: true,
-                            avatarUrl: true,
+                            avatarMime: true,
                         }
                     }
                 }
@@ -117,7 +135,7 @@ export async function getUserConversations(userId: string) {
             updatedAt: 'desc'
         }
     });
-    return conversations;
+    return conversations.map(c => normalizeConversation(c));
 }
 
 
@@ -134,7 +152,7 @@ export async function getConversationById(conversationId: string,userId: string)
                         select: {
                             id: true,
                             name: true,
-                            avatarUrl: true,
+                            avatarMime: true,
                         }
                     }
                 }
@@ -145,7 +163,7 @@ export async function getConversationById(conversationId: string,userId: string)
     if(!conversation) {
         throw new Error('Conversation not found or access denied');
     }
-    return conversation;
+    return normalizeConversation(conversation);
 }
 
 export async function archiveConversation(conversationId: string, userId: string) {

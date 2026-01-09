@@ -1,4 +1,5 @@
 import {prisma} from '../utils/prisma.js';
+import { withAvatarUrl } from '../utils/avatar.js';
 
 export async function createMessage(data: {
     conversationId: string;
@@ -28,7 +29,7 @@ export async function createMessage(data: {
                     select:{
                         id:true,
                         name:true,
-                        avatarUrl:true,
+                        avatarMime:true,
                     }
                 }
             }
@@ -38,7 +39,10 @@ export async function createMessage(data: {
             data:{updatedAt: new Date() },
         }),
     ]);
-    return message;
+    return {
+        ...message,
+        sender: withAvatarUrl(message.sender as any),
+    };
 }
 
 export async function getMessages(conversationId: string,userId:string,options?: {limit?: number; cursor?: string;}) {
@@ -63,13 +67,16 @@ export async function getMessages(conversationId: string,userId:string,options?:
                 select: {
                     id: true,
                     name: true,
-                    avatarUrl: true,
+                    avatarMime: true,
                 }
             }
         }
     });
 
-    return messages.reverse();
+    return messages.reverse().map(m => ({
+        ...m,
+        sender: withAvatarUrl(m.sender as any),
+    }));
 }
 
 export async function markMessagesAsRead(conversationId: string, userId: string) {
@@ -97,7 +104,7 @@ export async function deleteMessage(messageId: string, userId: string) {
         throw new Error('User is not the sender of the message');
     }
 
-    return await prisma.message.update({
+    const updated = await prisma.message.update({
         where: { id: messageId },
         data: { isDeleted: true, deletedAt: new Date(), content: '' },
         include: {
@@ -105,11 +112,16 @@ export async function deleteMessage(messageId: string, userId: string) {
                 select: {
                     id: true,
                     name: true,
-                    avatarUrl: true,
+                    avatarMime: true,
                 }
             }
         }
     });
+
+    return {
+        ...updated,
+        sender: withAvatarUrl(updated.sender as any),
+    };
 }
 
 export async function editMessage(messageId: string, userId: string, newContent: string) {
@@ -122,7 +134,7 @@ export async function editMessage(messageId: string, userId: string, newContent:
     if (message.senderId !== userId) {
         throw new Error('User is not the sender of the message');
     }
-    return await prisma.message.update({
+    const updated = await prisma.message.update({
         where: { id: messageId },
         data: { content: newContent, isEdited: true ,editedAt: new Date()},
         include:{
@@ -130,11 +142,16 @@ export async function editMessage(messageId: string, userId: string, newContent:
                 select:{
                     id:true,
                     name:true,
-                    avatarUrl:true,
+                    avatarMime:true,
                 }
             }
         }
     });
+
+    return {
+        ...updated,
+        sender: withAvatarUrl(updated.sender as any),
+    };
 }
 
 export async function getUnreadCountsByConversationIds(conversationIds: string[], userId: string) {

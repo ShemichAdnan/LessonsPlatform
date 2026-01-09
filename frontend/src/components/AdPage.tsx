@@ -122,13 +122,7 @@ export const AdPage = () => {
                   <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-sunglow-500 to-sunglow-400 opacity-75 blur-sm" />
                   <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full ring-2 ring-sunglow-500/50 overflow-hidden bg-background">
                     <img
-                      src={
-                        ad.user.avatarUrl
-                          ? ad.user.avatarUrl.startsWith("http")
-                            ? ad.user.avatarUrl
-                            : `http://localhost:4000${ad.user.avatarUrl}`
-                          : defaultAvatar
-                      }
+                      src={ad.user.avatarUrl || defaultAvatar}
                       alt={ad.user.name}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -137,7 +131,6 @@ export const AdPage = () => {
                       }}
                     />
                   </div>
-                  
                 </div>
 
                 <div className="mt-4 text-center flex justify-center items-center flex-col ">

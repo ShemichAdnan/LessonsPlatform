@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { io, type Socket } from "socket.io-client";
+import {
+  io,
+  type ManagerOptions,
+  type Socket,
+  type SocketOptions,
+} from "socket.io-client";
 import { useAuth } from "./AuthContext";
 
 type SocketContextType = {
@@ -45,10 +50,16 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    const socketInstance = io("http://localhost:4000", {
+    const socketOptions: Partial<ManagerOptions & SocketOptions> = {
+      path: "/socket.io",
       withCredentials: true,
       transports: ["websocket"],
-    });
+    };
+
+    const socketUrl = import.meta.env.VITE_SOCKET_URL as string | undefined;
+    const socketInstance = socketUrl
+      ? io(socketUrl, socketOptions)
+      : io(socketOptions);
 
     setSocket(socketInstance);
 

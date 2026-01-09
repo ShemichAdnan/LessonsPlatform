@@ -176,13 +176,7 @@ export const AllProfilesPage = () => {
                     <CardContent className="p-0 flex flex-col">
                       <div className="relative h-48 w-full overflow-hidden ">
                         <img
-                          src={
-                            profile.avatarUrl
-                              ? profile.avatarUrl.startsWith("http")
-                                ? profile.avatarUrl
-                                : `http://localhost:4000${profile.avatarUrl}`
-                              : defaultAvatar
-                          }
+                          src={profile.avatarUrl || defaultAvatar}
                           alt={profile.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {

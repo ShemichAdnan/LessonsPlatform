@@ -20,7 +20,7 @@ export const getAllProfiles = async (): Promise<Profile[]> => {
             id: u.id,
             name: u.name,
             email: u.email,
-            avatarUrl: u.avatarUrl && u.avatarUrl.trim() !== '' ? u.avatarUrl : null,
+            avatarUrl: u.avatarUrl ?? null,
             bio: u.bio,
             subjects: u.subjects as string[] | null,
 
@@ -40,7 +40,7 @@ export const getProfileById = async (userId: string): Promise<Profile | null> =>
             id: user.id,
             name: user.name,
             email: user.email,
-            avatarUrl: user.avatarUrl && user.avatarUrl.trim() !== '' ? user.avatarUrl : null,
+            avatarUrl: user.avatarUrl ?? null,
             bio: user.bio,        
             createdAt: user.createdAt,
             experience: user.experience,
@@ -50,5 +50,13 @@ export const getProfileById = async (userId: string): Promise<Profile | null> =>
         };
     } catch (error) {
         throw new Error('Failed to fetch profile');
+    }
+}
+
+export const getProfileAvatar = async (userId: string) => {
+    try {
+        return await userModel.getAvatarData(userId);
+    } catch {
+        throw new Error('Failed to fetch avatar');
     }
 }

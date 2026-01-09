@@ -1,11 +1,12 @@
 import { prisma } from '../utils/prisma.js';
 import { createAd } from './adModel.js';
+import { withAvatarUrl } from '../utils/avatar.js';
 
 const userSelect = {
   id: true,
   email: true,
   name: true,
-  avatarUrl: true,
+  avatarMime: true,
   bio: true,
   city: true,
   experience: true,
@@ -16,20 +17,24 @@ const userSelect = {
 
 export const userModel = {
   async findByEmail(email: string) {
-    return prisma.user.findUnique({ 
+    const user = await prisma.user.findUnique({ 
       where: { email },
       select: {
         ...userSelect,
         passwordHash: true,
       }
     });
+
+    return user ? withAvatarUrl(user) : null;
   },
 
   async findById(id: string) {
-    return prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id },
       select: userSelect,
     });
+
+    return user ? withAvatarUrl(user) : null;
   },
 
   async findByIdWithPassword(id: string) {
@@ -40,13 +45,15 @@ export const userModel = {
   },
 
   async create(data: { email: string; name: string; passwordHash: string }) {
-    return prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         ...data,
         subjects: [],
       },
       select: userSelect,
     });
+
+    return withAvatarUrl(user);
   },
 
   async updateProfile(id: string, data: {
@@ -57,18 +64,35 @@ export const userModel = {
     pricePerHour?: number;
     subjects?: string[];
   }) {
-    return prisma.user.update({
+    const user = await prisma.user.update({
       where: { id },
       data,
       select: userSelect,
     });
+
+    return withAvatarUrl(user);
   },
 
-  async updateAvatar(id: string, avatarUrl: string) {
-    return prisma.user.update({
+  async updateAvatarData(id: string, avatarData: Buffer, avatarMime: string) {
+    const user = await prisma.user.update({
       where: { id },
-      data: { avatarUrl },
+      data: {
+        avatarData,
+        avatarMime,
+      },
       select: userSelect,
+    });
+
+    return withAvatarUrl(user);
+  },
+
+  async getAvatarData(id: string) {
+    return prisma.user.findUnique({
+      where: { id },
+      select: {
+        avatarData: true,
+        avatarMime: true,
+      },
     });
   },
 
@@ -80,15 +104,17 @@ export const userModel = {
   },
 
   async listProfiles() {
-    return prisma.user.findMany({
+    const users = await prisma.user.findMany({
       select:{
         id: true,
         name: true,
-        avatarUrl: true,
+        avatarMime: true,
         bio: true,
         email: true,
         subjects: true,
       }
     });
+
+    return users.map(u => withAvatarUrl(u as any));
   }
 };

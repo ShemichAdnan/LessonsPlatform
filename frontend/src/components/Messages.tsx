@@ -609,13 +609,7 @@ export function Messages() {
                   <Avatar className="w-12 h-12 ring-2 ring-gray1 ">
                     <AvatarImage
                       className="object-cover object-center"
-                      src={
-                        conversation.participantAvatar
-                          ? conversation.participantAvatar.startsWith("http")
-                            ? conversation.participantAvatar
-                            : `http://localhost:4000${conversation.participantAvatar}`
-                          : defaultAvatar
-                      }
+                      src={conversation.participantAvatar || defaultAvatar}
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = defaultAvatar;
@@ -669,13 +663,7 @@ export function Messages() {
                 <Avatar className="w-11 h-11 ring-2 ring-sunglow-500/30">
                   <AvatarImage
                     className="object-cover object-center"
-                    src={
-                      selectedOther.avatarUrl
-                        ? selectedOther.avatarUrl.startsWith("http")
-                          ? selectedOther.avatarUrl
-                          : `http://localhost:4000${selectedOther.avatarUrl}`
-                        : defaultAvatar
-                    }
+                    src={selectedOther.avatarUrl || defaultAvatar}
                     onError={(e) => {
                       e.currentTarget.onerror = null;
                       e.currentTarget.src = defaultAvatar;

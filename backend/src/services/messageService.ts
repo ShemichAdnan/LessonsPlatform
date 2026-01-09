@@ -85,6 +85,8 @@ export async function getUnreadCountsList(userId: string) {
 
 export async function getRecipientUserIdsForConversation(conversationId: string, senderId: string) {
     const conversation = await conversationModel.getConversationById(conversationId, senderId);
-    const ids = conversation.participants.map(p => p.userId).filter(id => id !== senderId);
+    const ids = conversation.participants
+        .map((p: { userId: string }) => p.userId)
+        .filter((id: string) => id !== senderId);
     return Array.from(new Set(ids));
 }
