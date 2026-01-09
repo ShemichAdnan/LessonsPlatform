@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  GraduationCap,
   Menu,
   LogOut,
   Search,
   MessageSquare,
-  Sparkles,
   Users,
   User,
   X,
@@ -16,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useAuth } from "../contexts/AuthContext";
 import { useSocket } from "../contexts/SocketContext";
 import defaultAvatar from "../assets/images/defaultAvatar.png";
+import logoAplikacije from "../assets/images/logoAplikacije.png";
 
 const menuItems = [
   { path: "/browse", label: "Browse Ads", icon: Search },
@@ -77,9 +76,11 @@ export function FloatingMenu() {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sunglow-400 to-sunglow-600 flex items-center justify-center shadow-lg shadow-sunglow-500/20">
-                    <GraduationCap className="w-6 h-6 text-background" />
-                  </div>
+                  <img
+                    src={logoAplikacije}
+                    alt="LearnConnect"
+                    className="w-10 h-10 rounded-xl object-contain"
+                  />
                   <span className="text-xl font-semibold text-sunglow-50">
                     LearnConnect
                   </span>

@@ -9,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import logoAplikacije from "../assets/images/logoAplikacije.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { GraduationCap } from "lucide-react";
 import type { User } from "../App";
 import AuthBG from "../assets/images/BgPhoto.jpg";
 import {
@@ -70,9 +70,11 @@ export function AuthPage({ onLogin }: AuthPageProps) {
       <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center relative z-10">
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sunglow-400 to-sunglow-600 flex items-center justify-center shadow-lg shadow-sunglow-500/20">
-              <GraduationCap className="w-7 h-7 text-white" />
-            </div>
+            <img
+                    src={logoAplikacije}
+                    alt="LearnConnect"
+                    className="w-10 h-10 rounded-xl object-contain"
+                  />
             <span className="text-2xl font-semibold text-white">
               LearnConnect
             </span>
