@@ -140,7 +140,11 @@ export function useProfileManager(user: User, onUserUpdate: (user: User) => void
             setSelectedAvatarFile(null);
             setAvatarPreview(null);
         } catch (err: any) {
-            setError(err.message || "Failed to update profile.");
+            setError(
+                err?.response?.data?.message ||
+                err?.message ||
+                "Failed to update profile."
+            );
         } finally {
             setSaving(false);
         }

@@ -46,6 +46,10 @@ export function AuthPage({ onLogin }: AuthPageProps) {
           setError("Passwords do not match");
           setLoading(false);
           return;
+        } else if(name.trim().length <2 || name.trim().length >30){
+          setError("Name must be between 2 and 30 characters");
+          setLoading(false);
+          return;
         }
 
         user = await registerApi({ email, name, password });

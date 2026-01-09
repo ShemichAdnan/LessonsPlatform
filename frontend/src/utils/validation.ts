@@ -31,14 +31,17 @@ export const validatePassword = (password: string): string | null => {
     if (data.bio.trim().length > 500) {
         return "Bio cannot exceed 500 characters";
     }
-    if(data.city.trim().length >100) {
-        return "City name cannot exceed 100 characters";
+    if(data.city.trim().length >30) {
+        return "City name cannot exceed 30 characters";
     }
     if(data.experience && (parseInt(data.experience) < 0 || parseInt(data.experience) > 80)) {
         return "Experience must be between 0 and 80 years";
     }
     if(data.pricePerHour && parseInt(data.pricePerHour) < 0) {
         return "Price per hour cannot be negative";
+    }
+    if(data.name.trim().length > 30) {
+        return "Name cannot exceed 30 characters";
     }
     return null;
   };

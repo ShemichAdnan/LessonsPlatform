@@ -10,7 +10,7 @@ export const passwordSchema = z
 
 export const RegisterDto = z.object({
   email: z.string().email(),
-  name: z.string().min(2),
+  name: z.string().min(2).max(30),
   password: passwordSchema,
 });
 
@@ -20,11 +20,11 @@ export const LoginDto = z.object({
 });
 
 export const UpdateProfileDto = z.object({
-  name: z.string().min(2).optional(),
+  name: z.string().min(2).max(30).optional(),
   bio: z.string().max(500).optional(),
-  city: z.string().max(100).optional(),
+  city: z.string().max(30).optional(),
   experience: z.number().int().min(0).max(80).optional(),
-  pricePerHour: z.number().int().min(0).max(10000).optional(),
+  pricePerHour: z.number().int().min(0).max(1000).optional(),
   subjects: z.array(z.string()).optional(),
   currentPassword: z.string().min(1, { message: 'Current password is required' }),
 });

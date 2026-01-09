@@ -26,7 +26,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { FloatingCreateAd } from "./FloatingCreateAd";
 import { deleteAd, getAdById } from "../services/adApi";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarImage } from "./ui/avatar";
 import defaultAvatar from "../assets/images/defaultAvatar.png";
 
 interface AdCardProps {
@@ -88,15 +88,6 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
     }
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   return (
     <>
       <Card
@@ -146,14 +137,14 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
         <CardContent className="space-y-3 pt-2">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             <BookOpen className="w-4 h-4 text-sunglow-400" />
-            {ad.areas.slice(0, 4).map((area, index) => (
+            {ad.areas.slice(0, 2).map((area, index) => (
               <span key={index} className="text-sunglow-200">
-                {area}
-                {index < Math.min(ad.areas.length, 4) - 1 && ","}
+                {area.length > 10 ? `${area.slice(0, 10)}...` : area}
+                {index < Math.min(ad.areas.length, 2) - 1 && ","}
               </span>
             ))}
-            {ad.areas.length > 4 && (
-              <span className="text-sunglow-400">+{ad.areas.length - 4}</span>
+            {ad.areas.length > 2 && (
+              <span className="text-sunglow-400">+{ad.areas.length - 2}</span>
             )}
             <span className="text-gray-600 mx-1">•</span>
             <span className="text-sunglow-200 bg-sunglow-500/10 px-2 py-0.5 rounded-full text-xs">
@@ -188,50 +179,50 @@ export const AdCard = ({ ad: initialAd, onAdUpdated }: AdCardProps) => {
                   e.currentTarget.src = defaultAvatar;
                 }}
               />
-              <AvatarFallback className="bg-gradient-to-br from-sunglow-500 to-sunglow-600 text-sunglow-50 font-semibold">
-                {getInitials(ad.user.name)}
-              </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <span className="font-medium text-sunglow-50 truncate block">
                 {ad.user.name}
               </span>
-              {ad.user.experience && (
-                <span className="text-xs text-gray-500 flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {ad.user.experience}y experience
-                </span>
-              )}
+              {
+                ad.user.experience != null &&
+                Number(ad.user.experience) !== 0 && (
+                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {ad.user.experience}y experience
+                  </span>
+                )}
             </div>
+            {user && user.id === ad.userId && (
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditPanelOpen(true);
+                  }}
+                  className="p-2 rounded-lg bg-gray1/80 hover:bg-sunglow-400/20 text-sunglow-300 hover:text-sunglow-200 transition-all duration-200 cursor-pointer"
+                  title="Edit ad"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteConfirm(true);
+                  }}
+                  disabled={deleting}
+                  className="p-2 rounded-lg bg-gray1/80 hover:bg-sunglow-600/30 text-sunglow-400 hover:text-sunglow-300 transition-all duration-200 disabled:opacity-50 cursor-pointer"
+                  title="Delete ad"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         </CardContent>
 
         <CardFooter className="pt-0">
-          {user && user.id === ad.userId ? (
-            <div className="w-full flex justify-end gap-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsEditPanelOpen(true);
-                }}
-                className="p-2 rounded-lg bg-gray1/80 hover:bg-sunglow-400/20 text-sunglow-300 hover:text-sunglow-200 transition-all duration-200 cursor-pointer"
-                title="Edit ad"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowDeleteConfirm(true);
-                }}
-                disabled={deleting}
-                className="p-2 rounded-lg bg-gray1/80 hover:bg-sunglow-600/30 text-sunglow-400 hover:text-sunglow-300 transition-all duration-200 disabled:opacity-50 cursor-pointer"
-                title="Delete ad"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ) : user ? (
+          {user && user.id !== ad.userId ? (
             <Button
               className="w-full bg-sunglow-400/10 text-sunglow-300 border border-sunglow-400/30 hover:bg-sunglow-400/20 cursor-pointer"
               variant="outline"

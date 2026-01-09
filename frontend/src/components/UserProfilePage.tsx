@@ -156,7 +156,7 @@ export const UserProfilePage = () => {
                     </div>
                   )}
 
-                  {profile.experience && (
+                  {profile.experience!==null && (
                     <div className="flex items-center gap-1.5 text-sunglow-200/70 text-sm">
                       <Briefcase className="w-4 h-4 text-sunglow-400" />
                       <span>{profile.experience} years experience</span>

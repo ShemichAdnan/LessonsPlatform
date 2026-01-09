@@ -117,7 +117,7 @@ export const AdPage = () => {
 
           <div className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-              <div className="flex flex-col items-center md:items-start">
+              <div className="flex flex-col items-center ">
                 <div className="relative">
                   <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-sunglow-500 to-sunglow-400 opacity-75 blur-sm" />
                   <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full ring-2 ring-sunglow-500/50 overflow-hidden bg-background">
@@ -137,17 +137,18 @@ export const AdPage = () => {
                       }}
                     />
                   </div>
+                  
                 </div>
 
-                <div className="mt-4 text-center flex justify-center items-center flex-col md:text-left">
+                <div className="mt-4 text-center flex justify-center items-center flex-col ">
                   <h3 className="text-lg font-semibold text-sunglow-50">
                     {ad.user.name}
                   </h3>
-                  {ad.user.experience && (
-                    <div className="flex items-center gap-1.5 text-sunglow-200/70 text-sm mt-1 justify-center md:justify-start">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{ad.user.experience}y experience</span>
-                    </div>
+                  {ad.user.experience != null && (
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {ad.user.experience}y experience
+                    </span>
                   )}
                 </div>
               </div>
@@ -164,8 +165,8 @@ export const AdPage = () => {
                       {isTutor ? "Tutor" : "Student"}
                     </Badge>
                     {user && user.id === ad.userId && (
-                      <Badge className="bg-sunglow-400/20 text-sunglow-200 border-sunglow-400/30 px-3 py-1">
-                        <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                      <Badge className="bg-gradient-to-r from-sunglow-500 to-sunglow-600 text-sunglow-950 border-0 shadow-lg shadow-sunglow-500/20 font-semibold">
+                        <Sparkles className="w-3 h-3 mr-1" />
                         Your Ad
                       </Badge>
                     )}

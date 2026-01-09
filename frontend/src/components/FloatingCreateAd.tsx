@@ -142,6 +142,12 @@ export function FloatingCreateAd({
       if (description.trim().length < 20) {
         throw new Error("Description must be at least 20 characters long.");
       }
+      if(city && (city.trim().length > 30)) {
+        throw new Error("City name must be 30 characters or less.");
+      }
+      if(subject.trim().length > 40) {
+        throw new Error("Subject must be 40 characters or less.");
+      }
 
       const adData: CreateAdData = {
         type: adType,

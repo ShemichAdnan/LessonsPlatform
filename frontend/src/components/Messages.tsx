@@ -606,8 +606,9 @@ export function Messages() {
                 }`}
               >
                 <div className="relative flex-shrink-0 w-full sm:w-auto flex justify-center sm:block">
-                  <Avatar className="w-12 h-12 ring-2 ring-gray1">
+                  <Avatar className="w-12 h-12 ring-2 ring-gray1 ">
                     <AvatarImage
+                      className="object-cover object-center"
                       src={
                         conversation.participantAvatar
                           ? conversation.participantAvatar.startsWith("http")
@@ -620,9 +621,6 @@ export function Messages() {
                         e.currentTarget.src = defaultAvatar;
                       }}
                     />
-                    <AvatarFallback className="bg-gradient-to-br from-sunglow-500 to-sunglow-600 text-sunglow-950 font-semibold">
-                      {conversation.participantName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
                   </Avatar>
                   {conversation.online && (
                     <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-gray2 rounded-full" />
@@ -670,6 +668,7 @@ export function Messages() {
               <div className="relative">
                 <Avatar className="w-11 h-11 ring-2 ring-sunglow-500/30">
                   <AvatarImage
+                    className="object-cover object-center"
                     src={
                       selectedOther.avatarUrl
                         ? selectedOther.avatarUrl.startsWith("http")
